@@ -24,6 +24,9 @@ public class KnightMoves {
         if (curr_col - 1 < 1){
             return;
         }
+        //if (curr... has piece){
+            //if piece = my color
+                //return
         return [curr_row+2, curr_col-1];
     }
 
@@ -35,6 +38,9 @@ public class KnightMoves {
         if (curr_col + 1 > 8){
             return;
         }
+        //if (curr... has piece){
+            //if piece = my color
+            //return
         return [curr_row+2, curr_col+1];
     }
 
@@ -46,6 +52,9 @@ public class KnightMoves {
         if (curr_col + 2 > 8){
             return;
         }
+        //if (curr... has piece){
+            //if piece = my color
+            //return
         return [curr_row+1, curr_col+2];
     }
 
@@ -56,6 +65,9 @@ public class KnightMoves {
         if (curr_col + 2 > 8){
             return;
         }
+        //if (curr... has piece){
+        //if piece = my color
+        //return
         return [curr_row-1, curr_col+2];
     }
 
@@ -66,6 +78,9 @@ public class KnightMoves {
         if (curr_col + 1 > 8){
             return;
         }
+        //if (curr... has piece){
+        //if piece = my color
+        //return
         return [curr_row-2, curr_col+1];
     }
 
@@ -76,6 +91,9 @@ public class KnightMoves {
         if (curr_col - 1 < 1){
             return;
         }
+        //if (curr... has piece){
+        //if piece = my color
+        //return
         return [curr_row-2, curr_col-1];
     }
 
@@ -86,6 +104,9 @@ public class KnightMoves {
         if (curr_col - 2 < 1){
             return;
         }
+        //if (curr... has piece){
+        //if piece = my color
+        //return
         return [curr_row-1, curr_col-2];
     }
 
@@ -96,6 +117,9 @@ public class KnightMoves {
         if (curr_col - 2 < 1){
             return;
         }
+        //if (curr... has piece){
+        //if piece = my color
+        //return
         return [curr_row+1, curr_col-2];
     }
 
