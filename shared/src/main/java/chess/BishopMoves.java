@@ -8,13 +8,18 @@ public class BishopMoves {
         int [][] moves_list;
 
 
+        //append to list up_right list
+        //append to list down_right list
+        //append to list up_left list
+        //append to list down_left list
+
 
         return moves_list;
     }
 
     private up_right(ChessBoard board, ChessPosition myPosition){
-        curr_row=;
-        curr_col=;
+        int curr_row = myPosition.getRow();
+        int curr_col = myPosition.getColumn();
         while (curr_row < 8 & curr_col < 8){
             //curr_row++ curr_col++(go up and right)
             //if there is a piece there
@@ -28,8 +33,8 @@ public class BishopMoves {
     }
 
     private down_right(ChessBoard board, ChessPosition myPosition){
-        curr_row=;
-        curr_col=;
+        int curr_row = myPosition.getRow();
+        int curr_col = myPosition.getColumn();
         while (curr_row > 0 & curr_col < 8){
             //curr_row-- curr_col++(go down and right)
             //if there is a piece there
@@ -43,8 +48,8 @@ public class BishopMoves {
     }
 
     private up_left(ChessBoard board, ChessPosition myPosition){
-        curr_row=;
-        curr_col=;
+        int curr_row = myPosition.getRow();
+        int curr_col = myPosition.getColumn();
         while (curr_row < 8 & curr_col > 0){
             //curr_row++ curr_col--(go up and left)
             //if there is a piece there
@@ -58,8 +63,8 @@ public class BishopMoves {
     }
 
     private down_left(ChessBoard board, ChessPosition myPosition){
-        curr_row=;
-        curr_col=;
+        int curr_row = myPosition.getRow();
+        int curr_col = myPosition.getColumn();
         while (curr_row > 0 & curr_col > 0){
             //curr_row-- curr_col--(go up and left)
             //if there is a piece there
