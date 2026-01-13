@@ -4,7 +4,7 @@ public class BishopMoves {
 
     public getBishopMoves(ChessBoard board, ChessPosition myPosition){
 
-        private final playercolor = ChessPiece.getTeamColor();
+        private static playercolor = ChessPiece.getTeamColor();
         int [][] moves_list;
 
 
