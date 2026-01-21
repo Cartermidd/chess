@@ -1,5 +1,7 @@
 package chess;
 
+import chess.piecemoves.BishopMoves;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -35,14 +37,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return pieceColor;
+        return this.pieceColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return type;
+        return this.type;
     }
 
     /**
@@ -54,8 +56,9 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
-        if (piece.getPieceType() == PieceType.BISHOP){
-            return BishopMoves.getBishopMoves(board, myPosition);
+        if (this.getPieceType() == PieceType.BISHOP){
+            BishopMoves bishopMoves = new BishopMoves();
+            return bishopMoves.getBishopMoves(board, myPosition, piece);
         }
         return List.of();
     }

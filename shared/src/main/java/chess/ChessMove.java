@@ -40,7 +40,7 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        return promotionPiece;
+        return promotionPiece;//if pawn I guess idk
     }
 
 
@@ -49,4 +49,19 @@ public class ChessMove {
         return String.format("%s%s", startPosition, endPosition);
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (o == this) {
+            return true;
+        }
+        if (this.getClass() != o.getClass()) {
+            return false;
+        }
+        ChessMove cast = (ChessMove) o; //casting o object to a ChessMove object
+        return (this.startPosition.equals(cast.startPosition) && this.endPosition.equals(cast.endPosition) && this.promotionPiece == cast.promotionPiece);
+    }
 }

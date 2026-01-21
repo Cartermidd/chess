@@ -44,4 +44,22 @@ public class ChessBoard {
     public void resetBoard() {
         throw new RuntimeException("Not implemented");
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (o == this) {
+            return true;
+        }
+        if (this.getClass() != o.getClass()) {
+            return false;
+        }
+        ChessBoard cast = (ChessBoard) o; //casting o object to a ChessMove object
+        return (this.squares == cast.squares);
+    }
+
+
+
 }

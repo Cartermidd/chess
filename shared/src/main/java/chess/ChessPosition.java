@@ -36,4 +36,20 @@ public class ChessPosition {
     public String toString() {
         return String.format("[%d, %d]", row, col);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (o == this) {
+            return true;
+        }
+        if (this.getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPosition cast = (ChessPosition) o; //casting o object to a ChessMove object
+        return (this.row == cast.row && this.col == cast.col);
+    }
+
 }
