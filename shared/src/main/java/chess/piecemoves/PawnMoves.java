@@ -2,7 +2,6 @@ package chess.piecemoves;
 
 import chess.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class PawnMoves {
@@ -18,19 +17,19 @@ public class PawnMoves {
 
 
         if (myColor == ChessGame.TeamColor.WHITE){
-            moves_Array.addAll(whitePawnMoves(board, myPosition, myColor, PromotionPieces));
+            moves_Array.addAll(whitePawnMoves(board, myPosition, PromotionPieces));
         }else {
-            moves_Array.addAll(blackPawnMoves(board, myPosition, myColor, PromotionPieces));
+            moves_Array.addAll(blackPawnMoves(board, myPosition, PromotionPieces));
         }
         return moves_Array;
     }
 
 
-    private ArrayList<ChessMove> whitePawnMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor, ArrayList<ChessPiece.PieceType> PromotionPieces){
+    private ArrayList<ChessMove> whitePawnMoves(ChessBoard board, ChessPosition myPosition, ArrayList<ChessPiece.PieceType> PromotionPieces){
         ArrayList<ChessMove> white_move_array = new ArrayList<>();
         int curr_row = myPosition.getRow();
         int curr_col = myPosition.getColumn();
-        white_move_array.addAll(white_diagonal(board,curr_row,curr_col,myColor,PromotionPieces));
+        white_move_array.addAll(white_diagonal(board,curr_row,curr_col,PromotionPieces));
         if (curr_row == 2){
             ChessPosition start_one_up_pos = new ChessPosition(3, curr_col);
             ChessPosition start_two_up_pos = new ChessPosition(4,curr_col);
@@ -55,7 +54,7 @@ public class PawnMoves {
         return white_move_array;
     }
 
-    private ArrayList<ChessMove> white_diagonal(ChessBoard board, int curr_row, int curr_col, ChessGame.TeamColor myColor, ArrayList<ChessPiece.PieceType> PromotionPieces){
+    private ArrayList<ChessMove> white_diagonal(ChessBoard board, int curr_row, int curr_col, ArrayList<ChessPiece.PieceType> PromotionPieces){
         ChessPosition up_right_pos = null;
         ChessPosition up_left_pos = null;
         ArrayList<ChessMove> diagonal_moves = new ArrayList<>();
@@ -99,12 +98,12 @@ public class PawnMoves {
         }
     }
     
-    private ArrayList<ChessMove> blackPawnMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor, ArrayList<ChessPiece.PieceType> PromotionPieces){
+    private ArrayList<ChessMove> blackPawnMoves(ChessBoard board, ChessPosition myPosition, ArrayList<ChessPiece.PieceType> PromotionPieces){
         ArrayList<ChessMove> black_move_array = new ArrayList<>();
         int curr_row = myPosition.getRow();
         int curr_col = myPosition.getColumn();
 
-        black_move_array.addAll(black_diagonal(board,curr_row,curr_col,myColor,PromotionPieces));
+        black_move_array.addAll(black_diagonal(board,curr_row,curr_col,PromotionPieces));
         if (curr_row == 7) {
             ChessPosition start_one_up_pos = new ChessPosition(6, curr_col);
             ChessPosition start_two_up_pos = new ChessPosition(5, curr_col);
@@ -129,7 +128,7 @@ public class PawnMoves {
         return black_move_array;
     }
 
-    private ArrayList<ChessMove> black_diagonal(ChessBoard board, int curr_row, int curr_col, ChessGame.TeamColor myColor, ArrayList<ChessPiece.PieceType> PromotionPieces){
+    private ArrayList<ChessMove> black_diagonal(ChessBoard board, int curr_row, int curr_col, ArrayList<ChessPiece.PieceType> PromotionPieces){
         ChessPosition down_right_pos = null;
         ChessPosition down_left_pos = null;
         ArrayList<ChessMove> diagonal_moves = new ArrayList<>();
