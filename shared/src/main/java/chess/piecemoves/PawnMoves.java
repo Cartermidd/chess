@@ -20,10 +20,8 @@ public class PawnMoves {
         if (myColor == ChessGame.TeamColor.WHITE){
             moves_Array.addAll(whitePawnMoves(board, myPosition, myColor, PromotionPieces));
         }else {
-            moves_Array.addAll(blackPawnMoves(board, myPosition, myColor));
+            moves_Array.addAll(blackPawnMoves(board, myPosition, myColor, PromotionPieces));
         }
-
-
         return moves_Array;
     }
 
@@ -62,10 +60,10 @@ public class PawnMoves {
         ChessPosition up_left_pos = null;
         ArrayList<ChessMove> diagonal_moves = new ArrayList<>();
 
-        if (curr_col+1 < 8) {
+        if (curr_col+1 <= 8) {
             up_right_pos = new ChessPosition(curr_row + 1, curr_col + 1);
         }
-        if (curr_col-1 > 1) {
+        if (curr_col-1 >= 1) {
             up_left_pos = new ChessPosition(curr_row + 1, curr_col - 1);
         }
         if (up_right_pos != null){
@@ -101,14 +99,79 @@ public class PawnMoves {
         }
     }
     
-    private ArrayList<ChessMove> blackPawnMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor){
+    private ArrayList<ChessMove> blackPawnMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor, ArrayList<ChessPiece.PieceType> PromotionPieces){
         ArrayList<ChessMove> black_move_array = new ArrayList<>();
         int curr_row = myPosition.getRow();
         int curr_col = myPosition.getColumn();
 
+        black_move_array.addAll(black_diagonal(board,curr_row,curr_col,myColor,PromotionPieces));
+        if (curr_row == 7) {
+            ChessPosition start_one_up_pos = new ChessPosition(6, curr_col);
+            ChessPosition start_two_up_pos = new ChessPosition(5, curr_col);
+            if (board.getPiece(start_one_up_pos) == null) {
+                black_move_array.add(new ChessMove(myPosition, start_one_up_pos, null));
+                if (board.getPiece(start_two_up_pos) == null) {
+                    black_move_array.add(new ChessMove(myPosition, start_two_up_pos, null));
+                }
+            }
+        } else {
+            if (ValidMoveCheck(board, curr_row - 1, curr_col)) {
+                ChessPosition new_pos = new ChessPosition(curr_row - 1, curr_col);
+                if (black_promotion_check(new_pos)) {
+                    for (ChessPiece.PieceType promotion_piece : PromotionPieces) {
+                        black_move_array.add(new ChessMove(myPosition, new_pos, promotion_piece));
+                    }
+                } else {
+                    black_move_array.add(new ChessMove(myPosition, new_pos, null));
+                }
+            }
+        }
         return black_move_array;
     }
 
+    private ArrayList<ChessMove> black_diagonal(ChessBoard board, int curr_row, int curr_col, ChessGame.TeamColor myColor, ArrayList<ChessPiece.PieceType> PromotionPieces){
+        ChessPosition down_right_pos = null;
+        ChessPosition down_left_pos = null;
+        ArrayList<ChessMove> diagonal_moves = new ArrayList<>();
+
+        if (curr_col+1 <= 8) {
+            down_right_pos = new ChessPosition(curr_row - 1, curr_col + 1);
+        }
+        if (curr_col-1 >= 1) {
+            down_left_pos = new ChessPosition(curr_row - 1, curr_col - 1);
+        }
+        if (down_right_pos != null){
+            if (board.getPiece(down_right_pos) != null && board.getPiece(down_right_pos).getTeamColor() != ChessGame.TeamColor.BLACK){
+                if (black_promotion_check(down_right_pos)){
+                    for (ChessPiece.PieceType promotion_piece : PromotionPieces){
+                        diagonal_moves.add(new ChessMove(new ChessPosition(curr_row, curr_col), down_right_pos, promotion_piece));
+                    }
+                }else {
+                    diagonal_moves.add(new ChessMove(new ChessPosition(curr_row, curr_col), down_right_pos, null));
+                }
+            }
+        }
+        if (down_left_pos != null){
+            if (board.getPiece(down_left_pos) != null && board.getPiece(down_left_pos).getTeamColor() != ChessGame.TeamColor.BLACK){
+                if (black_promotion_check(down_left_pos)){
+                    for (ChessPiece.PieceType promotion_piece : PromotionPieces){
+                        diagonal_moves.add(new ChessMove(new ChessPosition(curr_row, curr_col), down_left_pos, promotion_piece));
+                    }
+                }else {
+                    diagonal_moves.add(new ChessMove(new ChessPosition(curr_row, curr_col), down_left_pos, null));
+                }
+            }
+        }
+        return diagonal_moves;
+    }
+
+    private boolean black_promotion_check(ChessPosition pos){
+        if(pos.getRow() == 1){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     private boolean ValidMoveCheck(ChessBoard board, int row, int col) {
         ChessPosition curr_pos;
@@ -124,25 +187,3 @@ public class PawnMoves {
             }
         }
     }
-
-
-
-
-
-//package chess.piecemoves;
-//
-//public class PawnMoves {
-//
-//
-//
-//
-//    //if piece hasn't been moved, you can move it two (if two spaces are available)
-//
-//    //if space in front, you can go forward
-//
-//    //if enemy diagonal forward, take is available
-//
-//    //promotion to be handled later
-//
-//
-//}
