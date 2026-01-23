@@ -3,7 +3,8 @@ package chess;
 import chess.piecemoves.*;
 
 import java.util.Collection;
-import java.util.List;
+
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -81,9 +82,21 @@ public class ChessPiece {
             return kingMoves.getKingMoves(board, myPosition, piece);
         }
         else{
-            //what?
-            //raise error
-            return null;
+            throw new RuntimeException("piece was none of the pieces lol");
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
     }
 }
