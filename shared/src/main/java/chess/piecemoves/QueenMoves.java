@@ -28,12 +28,13 @@ public class QueenMoves {
         //append to list down_left list
         moves_Array.addAll(down_left(board, curr_row, curr_col, myColor));
         //append to list up list
-        //moves_Array.addAll(up(board, curr_row, curr_col, myColor));
+        moves_Array.addAll(up(board, curr_row, curr_col, myColor));
         //append to list down list
-
+        moves_Array.addAll(down(board, curr_row, curr_col, myColor));
         //append to list right list
-
+        moves_Array.addAll(right(board, curr_row, curr_col, myColor));
         //append to list left list
+        moves_Array.addAll(left(board, curr_row, curr_col, myColor));
 
         return moves_Array;
     }
@@ -133,27 +134,86 @@ public class QueenMoves {
     }
 
     private ArrayList<ChessMove> up(ChessBoard board, int og_row, int og_col, ChessGame.TeamColor myColor) {
-        ArrayList<ChessMove> down_left_array = new ArrayList<>();
-        int curr_col = og_col;
+        ArrayList<ChessMove> up_array = new ArrayList<>();
         int curr_row = og_row;
         ChessPosition og_pos = new ChessPosition(og_row, og_col);
-        while (curr_row > 1 & curr_col > 1) {
-            curr_row--;
-            curr_col--;
-            //curr_row-- curr_col++(go down and right)
-            ChessPosition curr_pos = new ChessPosition(curr_row, curr_col);
+        while (curr_row < 8) {
+            curr_row++;//go up
+            ChessPosition curr_pos = new ChessPosition(curr_row, og_col);
             if (board.getPiece(curr_pos) != null) {//if there is a piece there
                 if (board.getPiece(curr_pos).getTeamColor() == myColor) {//if my color is the same as piece ///value based equality .equals()
                     break;//break
                 } else {//else (opponent color)
-                    down_left_array.add(new ChessMove(og_pos, curr_pos, null));//add to list
+                    up_array.add(new ChessMove(og_pos, curr_pos, null));//add to list
                     break;//break
                 }
             }
-            down_left_array.add(new ChessMove(og_pos, curr_pos, null));
+            up_array.add(new ChessMove(og_pos, curr_pos, null));
         }
-        return down_left_array;
+        return up_array;
     }
+
+    private ArrayList<ChessMove> down(ChessBoard board, int og_row, int og_col, ChessGame.TeamColor myColor) {
+        ArrayList<ChessMove> down_array = new ArrayList<>();
+        int curr_row = og_row;
+        ChessPosition og_pos = new ChessPosition(og_row, og_col);
+        while (curr_row > 1) {
+            curr_row--;//go down
+            ChessPosition curr_pos = new ChessPosition(curr_row, og_col);
+            if (board.getPiece(curr_pos) != null) {//if there is a piece there
+                if (board.getPiece(curr_pos).getTeamColor() == myColor) {//if my color is the same as piece ///value based equality .equals()
+                    break;//break
+                } else {//else (opponent color)
+                    down_array.add(new ChessMove(og_pos, curr_pos, null));//add to list
+                    break;//break
+                }
+            }
+            down_array.add(new ChessMove(og_pos, curr_pos, null));
+        }
+        return down_array;
+    }
+
+    private ArrayList<ChessMove> right(ChessBoard board, int og_row, int og_col, ChessGame.TeamColor myColor) {
+        ArrayList<ChessMove> right_array = new ArrayList<>();
+        int curr_col = og_col;
+        ChessPosition og_pos = new ChessPosition(og_row, og_col);
+        while (curr_col < 8) {
+            curr_col++;//go right
+            ChessPosition curr_pos = new ChessPosition(og_row, curr_col);
+            if (board.getPiece(curr_pos) != null) {//if there is a piece there
+                if (board.getPiece(curr_pos).getTeamColor() == myColor) {//if my color is the same as piece ///value based equality .equals()
+                    break;//break
+                } else {//else (opponent color)
+                    right_array.add(new ChessMove(og_pos, curr_pos, null));//add to list
+                    break;//break
+                }
+            }
+            right_array.add(new ChessMove(og_pos, curr_pos, null));
+        }
+        return right_array;
+    }
+
+    private ArrayList<ChessMove> left(ChessBoard board, int og_row, int og_col, ChessGame.TeamColor myColor) {
+        ArrayList<ChessMove> left_array = new ArrayList<>();
+        int curr_col = og_col;
+        ChessPosition og_pos = new ChessPosition(og_row, og_col);
+        while (curr_col > 1) {
+            curr_col--;//go right
+            ChessPosition curr_pos = new ChessPosition(og_row, curr_col);
+            if (board.getPiece(curr_pos) != null) {//if there is a piece there
+                if (board.getPiece(curr_pos).getTeamColor() == myColor) {//if my color is the same as piece ///value based equality .equals()
+                    break;//break
+                } else {//else (opponent color)
+                    left_array.add(new ChessMove(og_pos, curr_pos, null));//add to list
+                    break;//break
+                }
+            }
+            left_array.add(new ChessMove(og_pos, curr_pos, null));
+        }
+        return left_array;
+    }
+
+
 }
 
 

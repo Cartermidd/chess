@@ -1,6 +1,6 @@
 package chess;
 
-import chess.piecemoves.BishopMoves;
+import chess.piecemoves.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -60,6 +60,30 @@ public class ChessPiece {
             BishopMoves bishopMoves = new BishopMoves();
             return bishopMoves.getBishopMoves(board, myPosition, piece);
         }
-        return List.of();
+        else if (this.getPieceType() == PieceType.QUEEN){
+            QueenMoves queenMoves = new QueenMoves();
+            return queenMoves.getQueenMoves(board, myPosition, piece);
+        }
+        else if (this.getPieceType() == PieceType.PAWN){
+            PawnMoves pawnMoves = new PawnMoves();
+            return pawnMoves.getPawnMoves(board, myPosition, piece);
+        }
+        else if (this.getPieceType() == PieceType.ROOK){
+            RookMoves rookMoves = new RookMoves();
+            return rookMoves.getRookMoves(board, myPosition, piece);
+        }
+        else if (this.getPieceType() == PieceType.KNIGHT){
+            KnightMoves knightMoves = new KnightMoves();
+            return knightMoves.getKnightMoves(board, myPosition, piece);
+        }
+        else if (this.getPieceType() == PieceType.KING){
+            KingMoves kingMoves = new KingMoves();
+            return kingMoves.getKingMoves(board, myPosition, piece);
+        }
+        else{
+            //what?
+            //raise error
+            return null;
+        }
     }
 }
