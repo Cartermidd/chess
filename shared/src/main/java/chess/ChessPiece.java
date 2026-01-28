@@ -57,32 +57,31 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
-        if (this.getPieceType() == PieceType.BISHOP){
-            BishopMoves bishopMoves = new BishopMoves();
-            return bishopMoves.getBishopMoves(board, myPosition, piece);
-        }
-        else if (this.getPieceType() == PieceType.QUEEN){
-            QueenMoves queenMoves = new QueenMoves();
-            return queenMoves.getQueenMoves(board, myPosition, piece);
-        }
-        else if (this.getPieceType() == PieceType.PAWN){
-            PawnMoves pawnMoves = new PawnMoves();
-            return pawnMoves.getPawnMoves(board, myPosition, piece);
-        }
-        else if (this.getPieceType() == PieceType.ROOK){
-            RookMoves rookMoves = new RookMoves();
-            return rookMoves.getRookMoves(board, myPosition, piece);
-        }
-        else if (this.getPieceType() == PieceType.KNIGHT){
-            KnightMoves knightMoves = new KnightMoves();
-            return knightMoves.getKnightMoves(board, myPosition, piece);
-        }
-        else if (this.getPieceType() == PieceType.KING){
-            KingMoves kingMoves = new KingMoves();
-            return kingMoves.getKingMoves(board, myPosition, piece);
-        }
-        else{
-            throw new RuntimeException("piece was none of the pieces lol");
+
+        if (piece == null){
+            return null;
+            //throw new RuntimeException("no piece :-{");
+        } else if (piece.type == PieceType.PAWN){
+            chess.piecemoves.PawnMoves moves = new PawnMoves();
+            return moves.getPawnMoves(board, myPosition);
+        } else if (piece.type == PieceType.ROOK){
+            chess.piecemoves.RookMoves moves = new RookMoves();
+            return moves.getRookMoves(board, myPosition);
+        } else if (piece.type == PieceType.KNIGHT) {
+            chess.piecemoves.KnightMoves moves = new KnightMoves();
+            return moves.getKnightMoves(board, myPosition);
+        }else if (piece.type == PieceType.BISHOP){
+            chess.piecemoves.BishopMoves moves = new BishopMoves();
+            return moves.getBishopMoves(board, myPosition);
+        } else if (piece.type == PieceType.QUEEN){
+            chess.piecemoves.QueenMoves moves = new QueenMoves();
+            return moves.getQueenMoves(board, myPosition);
+        } else if (piece.type == PieceType.KING){
+            chess.piecemoves.KingMoves moves = new KingMoves();
+            return moves.getKingMoves(board, myPosition);
+        } else {
+            return null;
+            //throw new RuntimeException("piecetype not found bro lol");
         }
     }
 
