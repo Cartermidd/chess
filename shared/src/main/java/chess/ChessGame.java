@@ -81,11 +81,14 @@ public class ChessGame {
         } else if (!validMoves.contains(move)) {
             throw new InvalidMoveException("Invalid Move");
         } else {
-            this.board = ValidMover.moveMaker(board, move, turn_haver);
-            if (turn_haver == TeamColor.WHITE) {
-                setTeamTurn(TeamColor.BLACK);
-            } else if (turn_haver == TeamColor.BLACK) {
-                setTeamTurn(TeamColor.WHITE);
+            if (board.getPiece(move.getStartPosition()) != null){
+                ChessPiece piece = board.getPiece(move.getStartPosition());
+                setBoard(ValidMover.moveMaker(board, move, turn_haver, piece));
+                if (turn_haver == TeamColor.WHITE) {
+                    setTeamTurn(TeamColor.BLACK);
+                } else if (turn_haver == TeamColor.BLACK) {
+                    setTeamTurn(TeamColor.WHITE);
+                }
             }
         }
     }

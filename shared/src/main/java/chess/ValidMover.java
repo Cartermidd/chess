@@ -10,7 +10,7 @@ public class ValidMover {
         ChessGame copyGame = new ChessGame(game);
         for (ChessMove move : initial_list){
             copyGame.board = game.board;
-            moveMaker(copyGame.board, move, teamColor);
+            moveMaker(copyGame.board, move, teamColor, copyGame.board.getPiece(move.getStartPosition()));
             if (!copyGame.isInCheck(teamColor)){validMoves.add(move);}
         }
         return validMoves;
@@ -24,11 +24,11 @@ public class ValidMover {
      * @param board original board object (will be copied not edited)
      * @param move chess move on copy board
      */
-    public static ChessBoard moveMaker(ChessBoard board, ChessMove move, ChessGame.TeamColor teamColor){
+    public static ChessBoard moveMaker(ChessBoard board, ChessMove move, ChessGame.TeamColor teamColor, ChessPiece piece){
         ChessBoard copyBoard = new ChessBoard(board);
         ChessGame.TeamColor moverColor = teamColor;
         if (move.getPromotionPiece() == null){
-            copyBoard.addPiece(move.getEndPosition(), copyBoard.getPiece(move.getStartPosition()));
+            copyBoard.addPiece(move.getEndPosition(), piece);
             copyBoard.addPiece(move.getStartPosition(), null);
         } else {
             copyBoard.addPiece(move.getEndPosition(), new ChessPiece(moverColor, move.getPromotionPiece()));

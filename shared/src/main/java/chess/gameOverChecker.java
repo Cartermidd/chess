@@ -18,7 +18,7 @@ public class gameOverChecker {
         for (ChessPosition piece : teamPieces){
             if (game.validMoves(piece) != null){return false;}
         }
-        return false;
+        return true;
     }
 
 
