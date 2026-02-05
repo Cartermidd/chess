@@ -20,6 +20,11 @@ public class ChessGame {
         this.turn_haver = TeamColor.WHITE;
     }
 
+    public ChessGame(ChessGame original){
+        this.board = original.board;
+        this.turn_haver = original.turn_haver;
+    }
+
     /**
      * @return Which team's turn it is
      */
@@ -56,6 +61,7 @@ public class ChessGame {
         if (piece == null){
             return null;
         } else {
+            if (getTeamTurn() != piece.getTeamColor()){return null;}
             Collection<ChessMove> initial_list = piece.pieceMoves(getBoard(), startPosition);
             return ValidMover.validateMoves(getBoard(), startPosition, initial_list);
         }
@@ -69,7 +75,26 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
+        if (validMoves == null){
+            throw new InvalidMoveException("Invalid Move");
+        } else if (!validMoves.contains(move)) {
+            throw new InvalidMoveException("Invalid Move");
+        } else{
+            ChessBoard copyBoard = new ChessBoard(board);
+            ChessGame.TeamColor moverColor = copyBoard.getPiece(move.getStartPosition()).getTeamColor();
+            if (move.getPromotionPiece() == null){
+                copyBoard.addPiece(move.getEndPosition(), copyBoard.getPiece(move.getStartPosition()));
+                copyBoard.addPiece(move.getStartPosition(), null);
+            } else {
+                copyBoard.addPiece(move.getEndPosition(), new ChessPiece(moverColor, move.getPromotionPiece()));
+                copyBoard.addPiece(move.getStartPosition(), null);
+            }
+            this.board = copyBoard;
+            if (moverColor == TeamColor.WHITE){setTeamTurn(TeamColor.BLACK);}
+            else if (moverColor == TeamColor.BLACK){setTeamTurn(TeamColor.WHITE);}
+        }
+
     }
 
     /**
@@ -79,7 +104,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return CheckChecker.inCheck(board, teamColor);
     }
 
     /**
@@ -89,7 +114,9 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (!isInCheck(teamColor)){return false;}
+        ChessGame copy = new ChessGame(this);
+        if (gameOverChecker.inCheckmate(copy, copy.board, teamColor)){return true;} else {return false;}
     }
 
     /**
@@ -100,18 +127,17 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
-        //is teamColor in check?
-        //can teamColor make any move?
-            //no -> stalemate
+        if (isInCheck(teamColor)){return false;}
+        ChessGame copy = new ChessGame(this);
+        if (gameOverChecker.inStalemate(copy, copy.board, teamColor)){return true;} else {return false;}
     }
 
     /**
      * Sets this game's chessboard with a given board
      *
-     * @param board the new board to use
+     * @param NewBoard the New Board to use
      */
-    public void setBoard(ChessBoard board) {board.resetBoard();}
+    public void setBoard(ChessBoard NewBoard) {NewBoard.resetBoard();}
 
     /**
      * Gets the current chessboard
@@ -121,4 +147,28 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return board;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return Objects.equals(getBoard(), chessGame.getBoard()) && turn_haver == chessGame.turn_haver;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getBoard(), turn_haver);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessGame{" +
+                "board=" + board +
+                ", turn_haver=" + turn_haver +
+                '}';
+    }
+
+
 }
