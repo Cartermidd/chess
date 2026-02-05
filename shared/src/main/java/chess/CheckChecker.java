@@ -103,6 +103,7 @@ public class CheckChecker {
     }
 
     private static boolean positionChecker(ChessBoard board, ChessGame.TeamColor teamColor, ChessPosition endPos, ChessPiece.PieceType directionPiece) {
+        if (board.getPiece(endPos) == null){return false;}
         if(board.getPiece(endPos).getTeamColor() != teamColor & (board.getPiece(endPos).getPieceType() == directionPiece | board.getPiece(endPos).getPieceType() == ChessPiece.PieceType.QUEEN)){return true;} else {return false;}
     }
 
@@ -111,21 +112,25 @@ public class CheckChecker {
         if (teamColor == ChessGame.TeamColor.WHITE){
             if (inBounds(kingRow+1, kingCol+1)){
                 chess.ChessPosition currPos = new ChessPosition(kingRow+1, kingCol+1);
-                if (board.getPiece(currPos).getTeamColor() != teamColor & board.getPiece(currPos).getPieceType() == ChessPiece.PieceType.PAWN){return true;}
+                if (board.getPiece(currPos) == null){}
+                else if (board.getPiece(currPos).getTeamColor() != teamColor & board.getPiece(currPos).getPieceType() == ChessPiece.PieceType.PAWN){return true;}
             }
             if (inBounds(kingRow+1, kingCol-1)){
                 chess.ChessPosition currPos = new ChessPosition(kingRow+1, kingCol-1);
-                if (board.getPiece(currPos).getTeamColor() != teamColor & board.getPiece(currPos).getPieceType() == ChessPiece.PieceType.PAWN){return true;}
+                if (board.getPiece(currPos) == null){}
+                else if (board.getPiece(currPos).getTeamColor() != teamColor & board.getPiece(currPos).getPieceType() == ChessPiece.PieceType.PAWN){return true;}
             }
         }
         if (teamColor == ChessGame.TeamColor.BLACK){
             if (inBounds(kingRow-1, kingCol+1)){
                 chess.ChessPosition currPos = new ChessPosition(kingRow-1, kingCol+1);
-                if (board.getPiece(currPos).getTeamColor() != teamColor & board.getPiece(currPos).getPieceType() == ChessPiece.PieceType.PAWN){return true;}
+                if (board.getPiece(currPos) == null){}
+                else if (board.getPiece(currPos).getTeamColor() != teamColor & board.getPiece(currPos).getPieceType() == ChessPiece.PieceType.PAWN){return true;}
             }
             if (inBounds(kingRow-1, kingCol-1)){
                 chess.ChessPosition currPos = new ChessPosition(kingRow-1, kingCol-1);
-                if (board.getPiece(currPos).getTeamColor() != teamColor & board.getPiece(currPos).getPieceType() == ChessPiece.PieceType.PAWN){return true;}
+                if (board.getPiece(currPos) == null){}
+                else if (board.getPiece(currPos).getTeamColor() != teamColor & board.getPiece(currPos).getPieceType() == ChessPiece.PieceType.PAWN){return true;}
             }
         }
         return false;

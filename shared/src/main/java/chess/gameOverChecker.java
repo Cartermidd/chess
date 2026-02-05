@@ -8,7 +8,7 @@ public class gameOverChecker {
     public static boolean inStalemate(ChessGame game, ChessBoard board, ChessGame.TeamColor teamColor) {
         Collection<ChessPosition> teamPieces = findTeamPieces(board, teamColor);
         for (ChessPosition piece : teamPieces){
-            if (game.validMoves(piece) != null){return true;}
+            if (game.validMoves(piece) != null){return false;}
         }
         return false;
     }
@@ -16,7 +16,7 @@ public class gameOverChecker {
     public static boolean inCheckmate(ChessGame game, ChessBoard board, ChessGame.TeamColor teamColor) {
         Collection<ChessPosition> teamPieces = findTeamPieces(board, teamColor);
         for (ChessPosition piece : teamPieces){
-            if (game.validMoves(piece) != null){return true;}
+            if (game.validMoves(piece) != null){return false;}
         }
         return false;
     }

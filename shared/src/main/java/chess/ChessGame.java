@@ -63,7 +63,7 @@ public class ChessGame {
         } else {
             if (getTeamTurn() != piece.getTeamColor()){return null;}
             Collection<ChessMove> initial_list = piece.pieceMoves(getBoard(), startPosition);
-            return ValidMover.validateMoves(getBoard(), startPosition, initial_list);
+            return ValidMover.validateMoves(this, initial_list, piece.getTeamColor());
         }
 
     }
@@ -76,25 +76,18 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
-        if (validMoves == null){
+        if (validMoves == null) {
             throw new InvalidMoveException("Invalid Move");
         } else if (!validMoves.contains(move)) {
             throw new InvalidMoveException("Invalid Move");
-        } else{
-            ChessBoard copyBoard = new ChessBoard(board);
-            ChessGame.TeamColor moverColor = copyBoard.getPiece(move.getStartPosition()).getTeamColor();
-            if (move.getPromotionPiece() == null){
-                copyBoard.addPiece(move.getEndPosition(), copyBoard.getPiece(move.getStartPosition()));
-                copyBoard.addPiece(move.getStartPosition(), null);
-            } else {
-                copyBoard.addPiece(move.getEndPosition(), new ChessPiece(moverColor, move.getPromotionPiece()));
-                copyBoard.addPiece(move.getStartPosition(), null);
+        } else {
+            this.board = ValidMover.moveMaker(board, move, turn_haver);
+            if (turn_haver == TeamColor.WHITE) {
+                setTeamTurn(TeamColor.BLACK);
+            } else if (turn_haver == TeamColor.BLACK) {
+                setTeamTurn(TeamColor.WHITE);
             }
-            this.board = copyBoard;
-            if (moverColor == TeamColor.WHITE){setTeamTurn(TeamColor.BLACK);}
-            else if (moverColor == TeamColor.BLACK){setTeamTurn(TeamColor.WHITE);}
         }
-
     }
 
     /**
@@ -135,9 +128,9 @@ public class ChessGame {
     /**
      * Sets this game's chessboard with a given board
      *
-     * @param NewBoard the New Board to use
+     * @param board the New Board to use
      */
-    public void setBoard(ChessBoard NewBoard) {NewBoard.resetBoard();}
+    public void setBoard(ChessBoard board) {this.board = board;}
 
     /**
      * Gets the current chessboard
@@ -169,6 +162,4 @@ public class ChessGame {
                 ", turn_haver=" + turn_haver +
                 '}';
     }
-
-
 }
