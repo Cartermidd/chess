@@ -1,4 +1,5 @@
 package chess;
+import java.lang.Math;
 
 public class CheckChecker {
     public static boolean inCheck(ChessBoard board, ChessGame.TeamColor teamColor) {
@@ -15,7 +16,24 @@ public class CheckChecker {
         if (checkDiagonal(board, teamColor, kingRow, kingCol)) {
             return true;
         }
+        if (inRangeofOtherKing(board,teamColor, kingRow, kingCol)){
+            return true;
+        }
         return false;
+    }
+
+    private static boolean inRangeofOtherKing(ChessBoard board, ChessGame.TeamColor teamColor, int row, int col) {
+        ChessGame.TeamColor otherTeam;
+        if(teamColor == ChessGame.TeamColor.BLACK){otherTeam = ChessGame.TeamColor.WHITE;} else{otherTeam = ChessGame.TeamColor.BLACK;}
+        ChessPosition otherKing = findKing(board, otherTeam);
+        int otherRow = otherKing.getRow();
+        int otherCol = otherKing.getColumn();
+
+        if(Math.abs(row - otherRow) <= 1 & Math.abs(col - otherCol) <= 1){
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private static ChessPosition findKing(ChessBoard board, ChessGame.TeamColor teamColor){

@@ -5,22 +5,26 @@ import java.util.List;
 
 public class gameOverChecker {
     
-    public static boolean inStalemate(ChessGame game, ChessBoard board, ChessGame.TeamColor teamColor) {
-        Collection<ChessPosition> teamPieces = findTeamPieces(board, teamColor);
+    public static boolean inStalemate(ChessBoard board, ChessGame.TeamColor teamColor) {
+        ChessGame game = new ChessGame();
+        game.setBoard(new ChessBoard(board));
+        Collection<ChessPosition> teamPieces = findTeamPieces(game.getBoard(), teamColor);
+        Collection<ChessMove> availableMoves = new java.util.ArrayList<>(List.of());
         for (ChessPosition piece : teamPieces){
-            if (game.validMoves(piece) != null){return false;}
+            availableMoves.addAll(game.validMoves(piece));
         }
-        return true;
+        if (availableMoves.isEmpty()){return true;}else{return false;}
     }
 
     public static boolean inCheckmate(ChessBoard board, ChessGame.TeamColor teamColor) {
         ChessGame game = new ChessGame();
         game.setBoard(new ChessBoard(board));
         Collection<ChessPosition> teamPieces = findTeamPieces(game.board, teamColor);
+        Collection<ChessMove> escapeMoves = new java.util.ArrayList<>(List.of());
         for (ChessPosition piece : teamPieces){
-            if (game.validMoves(piece) != null){return false;}
+            escapeMoves.addAll(game.validMoves(piece));
         }
-        return true;
+        if (escapeMoves.isEmpty()){return true;}else{return false;}
     }
 
 

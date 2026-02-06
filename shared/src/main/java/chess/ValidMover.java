@@ -7,12 +7,14 @@ public class ValidMover {
 
     public static Collection<ChessMove> validateMoves(ChessBoard board, Collection<ChessMove> initial_list, ChessGame.TeamColor teamColor){
         Collection<ChessMove> validMoves = new java.util.ArrayList<>(List.of());
-        ChessGame game = new ChessGame();
-        game.setBoard(new ChessBoard(board));
+
         for (ChessMove move : initial_list){
-            game.board = board;
-            moveMaker(game.board, move, teamColor, game.board.getPiece(move.getStartPosition()));
-            if (!game.isInCheck(teamColor)){validMoves.add(move);}
+            ChessBoard testBoard = new ChessBoard(board);
+            ChessGame testGame = new ChessGame();
+            ChessPiece piece = testBoard.getPiece(move.getStartPosition());
+            testBoard = moveMaker(testBoard,move,teamColor,piece);
+            testGame.setBoard(testBoard);
+            if (!testGame.isInCheck(teamColor)){validMoves.add(move);}
         }
         return validMoves;
     }

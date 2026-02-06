@@ -64,8 +64,7 @@ public class ChessGame {
         } else {
 //            if (getTeamTurn() != piece.getTeamColor()){return null;}
             Collection<ChessMove> initial_list = piece.pieceMoves(getBoard(), startPosition);
-            Collection<ChessMove> updated_list = ValidMover.validateMoves(board, initial_list, piece.getTeamColor());
-            return updated_list;
+            return ValidMover.validateMoves(getBoard(), initial_list, piece.getTeamColor());
         }
 
     }
@@ -77,7 +76,7 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        ChessPiece piece = board.getPiece(move.getStartPosition());
+        ChessPiece piece = getBoard().getPiece(move.getStartPosition());
         Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
         if (validMoves == null) {
             throw new InvalidMoveException("Invalid Move");
@@ -86,7 +85,7 @@ public class ChessGame {
         } else if(getTeamTurn() != piece.getTeamColor()){
             throw new InvalidMoveException("Wrong turn");
         } else {
-            board = ValidMover.moveMaker(board, move, turn_haver, piece);
+            setBoard(ValidMover.moveMaker(board, move, turn_haver, piece));
             if (turn_haver == TeamColor.WHITE) {
                 setTeamTurn(TeamColor.BLACK);
             } else if (turn_haver == TeamColor.BLACK) {
@@ -102,7 +101,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        return CheckChecker.inCheck(board, teamColor);
+        return CheckChecker.inCheck(getBoard(), teamColor);
     }
 
     /**
@@ -111,9 +110,9 @@ public class ChessGame {
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
      */
-    public boolean isInCheckmate(TeamColor teamColor) {
+    public boolean isInCheckmate(TeamColor teamColor) { //broken
         if (!isInCheck(teamColor)){return false;}
-        if (gameOverChecker.inCheckmate(board, teamColor)){return true;} else {return false;}
+        if (gameOverChecker.inCheckmate(getBoard(), teamColor)){return true;} else {return false;}
     }
 
     /**
@@ -125,8 +124,7 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         if (isInCheck(teamColor)){return false;}
-        ChessGame copy = new ChessGame(this);
-        if (gameOverChecker.inStalemate(copy, copy.board, teamColor)){return true;} else {return false;}
+        if (gameOverChecker.inStalemate(getBoard(), teamColor)){return true;} else {return false;}
     }
 
     /**
