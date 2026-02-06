@@ -46,7 +46,7 @@ public class KnightMoves {
             if (board.getPiece(currPos) == null){
                 return true;
             } else {
-                if (board.getPiece(currPos).getTeamColor() != myColor){
+                if (board.getPiece(currPos).getTeamColor() != myColor && board.getPiece(currPos).getPieceType() != ChessPiece.PieceType.KING){
                     return true;
                 } else {
                     return false;

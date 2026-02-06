@@ -27,7 +27,7 @@ public class RookMoves {
             chess.ChessPosition currPos = new ChessPosition(curr_row, curr_col);
             if (board.getPiece(currPos) == null){
                 moves.add(new ChessMove(myPosition,currPos,null));
-            } else if (board.getPiece(currPos).getTeamColor() != myColor){
+            } else if (board.getPiece(currPos).getTeamColor() != myColor && board.getPiece(currPos).getPieceType() != ChessPiece.PieceType.KING){
                 moves.add(new ChessMove(myPosition,currPos,null));
                 break;
             } else {

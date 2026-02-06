@@ -62,7 +62,6 @@ public class ChessGame {
         if (piece == null){
             return null;
         } else {
-//            if (getTeamTurn() != piece.getTeamColor()){return null;}
             Collection<ChessMove> initial_list = piece.pieceMoves(getBoard(), startPosition);
             return ValidMover.validateMoves(getBoard(), initial_list, piece.getTeamColor());
         }
@@ -124,7 +123,8 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         if (isInCheck(teamColor)){return false;}
-        if (gameOverChecker.inStalemate(getBoard(), teamColor)){return true;} else {return false;}
+        ChessBoard safeboard = new ChessBoard(getBoard());
+        if (gameOverChecker.inStalemate(getBoard(), teamColor)){setBoard(safeboard); return true;} else {setBoard(safeboard); return false;}
     }
 
     /**
