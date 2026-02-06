@@ -10,11 +10,13 @@ public class gameOverChecker {
         for (ChessPosition piece : teamPieces){
             if (game.validMoves(piece) != null){return false;}
         }
-        return false;
+        return true;
     }
 
-    public static boolean inCheckmate(ChessGame game, ChessBoard board, ChessGame.TeamColor teamColor) {
-        Collection<ChessPosition> teamPieces = findTeamPieces(board, teamColor);
+    public static boolean inCheckmate(ChessBoard board, ChessGame.TeamColor teamColor) {
+        ChessGame game = new ChessGame();
+        game.setBoard(new ChessBoard(board));
+        Collection<ChessPosition> teamPieces = findTeamPieces(game.board, teamColor);
         for (ChessPosition piece : teamPieces){
             if (game.validMoves(piece) != null){return false;}
         }

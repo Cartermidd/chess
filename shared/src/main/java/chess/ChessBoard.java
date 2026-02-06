@@ -16,7 +16,12 @@ public class ChessBoard {
 
     }
     public ChessBoard(ChessBoard original){
-        this.squares = original.squares;
+        this.squares = new ChessPiece[8][8];
+        for (int i = 0; i<8; i++){
+            for (int j=0; j<8; j++){
+                this.squares[i][j] = original.squares[i][j];
+            }
+        }
     }
 
     /**
@@ -29,6 +34,7 @@ public class ChessBoard {
 
         squares[position.getRow()-1][position.getColumn()-1] = piece;
     }
+
     /**
      * Gets a chess piece on the chessboard
      *

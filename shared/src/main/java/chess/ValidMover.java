@@ -5,13 +5,14 @@ import java.util.List;
 
 public class ValidMover {
 
-    public static Collection<ChessMove> validateMoves(ChessGame game, Collection<ChessMove> initial_list, ChessGame.TeamColor teamColor){
+    public static Collection<ChessMove> validateMoves(ChessBoard board, Collection<ChessMove> initial_list, ChessGame.TeamColor teamColor){
         Collection<ChessMove> validMoves = new java.util.ArrayList<>(List.of());
-        ChessGame copyGame = new ChessGame(game);
+        ChessGame game = new ChessGame();
+        game.setBoard(new ChessBoard(board));
         for (ChessMove move : initial_list){
-            copyGame.board = game.board;
-            moveMaker(copyGame.board, move, teamColor, copyGame.board.getPiece(move.getStartPosition()));
-            if (!copyGame.isInCheck(teamColor)){validMoves.add(move);}
+            game.board = board;
+            moveMaker(game.board, move, teamColor, game.board.getPiece(move.getStartPosition()));
+            if (!game.isInCheck(teamColor)){validMoves.add(move);}
         }
         return validMoves;
     }
@@ -26,15 +27,13 @@ public class ValidMover {
      */
     public static ChessBoard moveMaker(ChessBoard board, ChessMove move, ChessGame.TeamColor teamColor, ChessPiece piece){
         ChessBoard copyBoard = new ChessBoard(board);
-        ChessGame.TeamColor moverColor = teamColor;
         if (move.getPromotionPiece() == null){
             copyBoard.addPiece(move.getEndPosition(), piece);
-            copyBoard.addPiece(move.getStartPosition(), null);
+            copyBoard.addPiece(move.getStartPosition(), null);//not removing the piece
         } else {
-            copyBoard.addPiece(move.getEndPosition(), new ChessPiece(moverColor, move.getPromotionPiece()));
-            copyBoard.addPiece(move.getStartPosition(), null);
+            copyBoard.addPiece(move.getEndPosition(), new ChessPiece(teamColor, move.getPromotionPiece()));
+            copyBoard.addPiece(move.getStartPosition(), null);//not removing the piece
         }
         return copyBoard;
     }
-
 }
