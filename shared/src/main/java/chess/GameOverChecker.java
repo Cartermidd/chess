@@ -3,7 +3,7 @@ package chess;
 import java.util.Collection;
 import java.util.List;
 
-public class gameOverChecker {
+public class GameOverChecker {
     
     public static boolean inStalemate(ChessBoard board, ChessGame.TeamColor teamColor) {
         ChessGame game = new ChessGame();

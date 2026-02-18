@@ -132,13 +132,13 @@ public class PawnMoves {
 
 
 
-    private boolean diagonalAttack(ChessBoard board, ChessPosition currPos, int row_direction, int col_direction, ChessGame.TeamColor myColor){
-        int new_row = currPos.getRow() + row_direction;
-        int new_col = currPos.getColumn() + col_direction;
+    private boolean diagonalAttack(ChessBoard board, ChessPosition currPos, int rowDirection, int colDirection, ChessGame.TeamColor myColor){
+        int newRow = currPos.getRow() + rowDirection;
+        int newCol = currPos.getColumn() + colDirection;
 
-        if (onBoard(new_row,new_col)){
-            if(board.getPiece(new ChessPosition(new_row,new_col)) != null){
-                if(board.getPiece(new ChessPosition(new_row,new_col)).getTeamColor() != myColor && board.getPiece(new ChessPosition(new_row,new_col)).getPieceType() != ChessPiece.PieceType.KING) {
+        if (onBoard(newRow,newCol)){
+            if(board.getPiece(new ChessPosition(newRow,newCol)) != null){
+                if(board.getPiece(new ChessPosition(newRow,newCol)).getTeamColor() != myColor && board.getPiece(new ChessPosition(newRow,newCol)).getPieceType() != ChessPiece.PieceType.KING) {
                     return true;
                 } else {
                     return false;

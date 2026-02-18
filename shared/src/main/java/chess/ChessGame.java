@@ -12,25 +12,25 @@ import java.util.Objects;
 public class ChessGame {
 
     ChessBoard board;
-    TeamColor turn_haver;
+    TeamColor turnHaver;
 
     public ChessGame() {
         this.board = new ChessBoard();
         setBoard(board);
-        this.turn_haver = TeamColor.WHITE;
+        this.turnHaver = TeamColor.WHITE;
         board.resetBoard();
     }
 
     public ChessGame(ChessGame original){
         this.board = original.board;
-        this.turn_haver = original.turn_haver;
+        this.turnHaver = original.turnHaver;
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        return turn_haver;
+        return turnHaver;
     }
 
     /**
@@ -39,7 +39,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        turn_haver = team;
+        turnHaver = team;
     }
 
     /**
@@ -62,8 +62,8 @@ public class ChessGame {
         if (piece == null){
             return null;
         } else {
-            Collection<ChessMove> initial_list = piece.pieceMoves(getBoard(), startPosition);
-            return ValidMover.validateMoves(getBoard(), initial_list, piece.getTeamColor());
+            Collection<ChessMove> initialList = piece.pieceMoves(getBoard(), startPosition);
+            return ValidMover.validateMoves(getBoard(), initialList, piece.getTeamColor());
         }
 
     }
@@ -84,10 +84,10 @@ public class ChessGame {
         } else if(getTeamTurn() != piece.getTeamColor()){
             throw new InvalidMoveException("Wrong turn");
         } else {
-            setBoard(ValidMover.moveMaker(board, move, turn_haver, piece));
-            if (turn_haver == TeamColor.WHITE) {
+            setBoard(ValidMover.moveMaker(board, move, turnHaver, piece));
+            if (turnHaver == TeamColor.WHITE) {
                 setTeamTurn(TeamColor.BLACK);
-            } else if (turn_haver == TeamColor.BLACK) {
+            } else if (turnHaver == TeamColor.BLACK) {
                 setTeamTurn(TeamColor.WHITE);
             }
         }
@@ -111,7 +111,7 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) { //broken
         if (!isInCheck(teamColor)){return false;}
-        if (gameOverChecker.inCheckmate(getBoard(), teamColor)){return true;} else {return false;}
+        if (GameOverChecker.inCheckmate(getBoard(), teamColor)){return true;} else {return false;}
     }
 
     /**
@@ -124,7 +124,7 @@ public class ChessGame {
     public boolean isInStalemate(TeamColor teamColor) {
         if (isInCheck(teamColor)){return false;}
         ChessBoard safeboard = new ChessBoard(getBoard());
-        if (gameOverChecker.inStalemate(getBoard(), teamColor)){setBoard(safeboard); return true;} else {setBoard(safeboard); return false;}
+        if (GameOverChecker.inStalemate(getBoard(), teamColor)){setBoard(safeboard); return true;} else {setBoard(safeboard); return false;}
     }
 
     /**
@@ -149,19 +149,19 @@ public class ChessGame {
             return false;
         }
         ChessGame chessGame = (ChessGame) o;
-        return chessGame.board.equals(board) && turn_haver == chessGame.turn_haver;
+        return chessGame.board.equals(board) && turnHaver == chessGame.turnHaver;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getBoard(), turn_haver);
+        return Objects.hash(getBoard(), turnHaver);
     }
 
     @Override
     public String toString() {
         return "ChessGame{" +
                 "board=" + board +
-                ", turn_haver=" + turn_haver +
+                ", turnHaver=" + turnHaver +
                 '}';
     }
 }

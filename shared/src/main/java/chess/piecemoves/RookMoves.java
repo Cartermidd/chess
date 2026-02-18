@@ -18,13 +18,13 @@ public class RookMoves {
     }
 
 
-    private ArrayList<ChessMove> moveUntil(ChessBoard board, ChessPosition myPosition, int row_direction, int col_direction, ChessGame.TeamColor myColor){
-        int curr_row = myPosition.getRow() + row_direction;
-        int curr_col = myPosition.getColumn() + col_direction;
+    private ArrayList<ChessMove> moveUntil(ChessBoard board, ChessPosition myPosition, int rowDirection, int colDirection, ChessGame.TeamColor myColor){
+        int currRow = myPosition.getRow() + rowDirection;
+        int currCol = myPosition.getColumn() + colDirection;
         ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
 
-        while (onBoard(curr_row,curr_col)){
-            chess.ChessPosition currPos = new ChessPosition(curr_row, curr_col);
+        while (onBoard(currRow,currCol)){
+            chess.ChessPosition currPos = new ChessPosition(currRow, currCol);
             if (board.getPiece(currPos) == null){
                 moves.add(new ChessMove(myPosition,currPos,null));
             } else if (board.getPiece(currPos).getTeamColor() != myColor && board.getPiece(currPos).getPieceType() != ChessPiece.PieceType.KING){
@@ -33,8 +33,8 @@ public class RookMoves {
             } else {
                 break;
             }
-            curr_row = curr_row + row_direction;
-            curr_col = curr_col + col_direction;
+            currRow = currRow + rowDirection;
+            currCol = currCol + colDirection;
         }
         return moves;
     }

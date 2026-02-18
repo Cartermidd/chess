@@ -5,10 +5,10 @@ import java.util.List;
 
 public class ValidMover {
 
-    public static Collection<ChessMove> validateMoves(ChessBoard board, Collection<ChessMove> initial_list, ChessGame.TeamColor teamColor){
+    public static Collection<ChessMove> validateMoves(ChessBoard board, Collection<ChessMove> initialList, ChessGame.TeamColor teamColor){
         Collection<ChessMove> validMoves = new java.util.ArrayList<>(List.of());
 
-        for (ChessMove move : initial_list){
+        for (ChessMove move : initialList){
             ChessBoard testBoard = new ChessBoard(board);
             ChessGame testGame = new ChessGame();
             ChessPiece piece = testBoard.getPiece(move.getStartPosition());
