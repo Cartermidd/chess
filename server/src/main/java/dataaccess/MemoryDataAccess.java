@@ -4,7 +4,7 @@ import models.*;
 import chess.*;
 import java.util.HashMap;
 
-public class MemoryDataAccess implements DataAccess {
+public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
     private int nextId = 1;
     final private HashMap<Integer, ChessGame> chessGames = new HashMap<>();
 

@@ -8,19 +8,21 @@ import exceptions.AlreadyTakenException;
 import exceptions.ImproperRequestException;
 import requests.RegisterRequest;
 import results.LoginResult;
-import service.RegisterService;
+import service.UserService;
 
 public class RegisterHandler {
-    RegisterService service;
+    Service service;
+    UserService userService;
 
-    public RegisterHandler(RegisterService service) {
+    public RegisterHandler(Service service, UserService userService) {
         this.service = service;
+        this.userService = userService;
     }
 
     public void register(Context ctx) {
         try {
             RegisterRequest request = new Gson().fromJson(ctx.body(), RegisterRequest.class);
-            LoginResult result = service.register(request);
+            LoginResult result = userService.register(request);
             ctx.result(new Gson().toJson(result));
         } catch(DataAccessException e) {
             ctx.status(400);

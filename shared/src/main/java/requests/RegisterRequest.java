@@ -10,4 +10,10 @@ public class RegisterRequest {
         this.password = password;
         this.email = email;
 }
+
+
+
+    public static boolean misformatted(RegisterRequest request){
+        return request.username == null | request.password == null;
+    }
 }

@@ -5,11 +5,13 @@ import dataaccess.DataAccessException;
 import io.javalin.*;
 import dataaccess.MemoryDataAccess;
 import io.javalin.http.Context;
-import service.Service;
 import server.handlers.*;
+import service.*;
 
 public class Server {
-    private final Service service;
+    private final UserService userService;
+    private final GameService gameService;
+    private final ClearService clearService;
     private final Javalin javalin;
     private final RegisterHandler RegisterHandler;
     private final LoginHandler LoginHandler;
@@ -20,7 +22,17 @@ public class Server {
     private final ClearHandler ClearHandler;
 
 
-    public Server() { this(new Service(new MemoryDataAccess()));}
+    public Server() {
+        MemoryDataAccess dao = new MemoryDataAccess();
+
+        UserService userService = new UserService(dao, dao);
+        GameService gameService = new GameService(dao, dao);
+        ClearService clearService = new ClearService(dao);
+
+        this.userService = userService;
+        this.gameService = gameService;
+        this.clearService = clearService;
+    }
 
     public Server(Service service) {
         this.service = service;

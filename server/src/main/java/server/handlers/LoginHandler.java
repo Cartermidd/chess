@@ -6,7 +6,6 @@ import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import exceptions.IncorrectPasswordException;
 import exceptions.UserDoesNotExistException;
-import service.Service;
 
 public class LoginHandler {
     Service service;
