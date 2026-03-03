@@ -1,20 +1,25 @@
 package server.handlers;
 
+import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import exceptions.UnauthorizedException;
+import requests.AuthorizedRequest;
+import requests.RegisterRequest;
+import results.GenericSuccessfulResult;
 import service.UserService;
 
 public class LogoutHandler {
-    UserService service;
+    UserService userService;
 
     public LogoutHandler(UserService service){
-        this.service = service;
+        this.userService = service;
     }
 
     public void logout(Context ctx) {
         try {
-            ctx.result(service.logout().toString());
+            AuthorizedRequest auth = new Gson().fromJson(ctx.body(), AuthorizedRequest.class);
+            ctx.result(userService.logout(auth).toString());
         }catch (DataAccessException _){
             ctx.status(400);
             ctx.result("Data Access Error");

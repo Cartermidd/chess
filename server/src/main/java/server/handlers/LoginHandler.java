@@ -6,6 +6,8 @@ import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import exceptions.IncorrectPasswordException;
 import exceptions.UserDoesNotExistException;
+import requests.LoginRequest;
+import results.LoginResult;
 import service.UserService;
 
 public class LoginHandler {
@@ -19,8 +21,8 @@ public class LoginHandler {
     public void login(Context ctx) {
         try {
             UserData user = new Gson().fromJson(ctx.body(), UserData.class);
-            user = service.login(user);
-            ctx.result(new Gson().toJson(user));
+            LoginResult result = service.login(new LoginRequest(user.getUsername(),user.getPassword()));
+            ctx.result(new Gson().toJson(result));
         }catch (DataAccessException _){
             ctx.status(400);
             ctx.result("Data Access Error");

@@ -17,4 +17,11 @@ public class CreateGameRequest {
     public String getGameName() {
         return gameName;
     }
+
+
+
+    public static boolean misformatted(CreateGameRequest request){
+        return request.authToken == null | request.gameName == null;
+    }
+
 }

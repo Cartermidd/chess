@@ -25,4 +25,8 @@ public class JoinGameRequest {
     public int getGameId() {
         return gameId;
     }
+
+    public static boolean misformatted(JoinGameRequest request){
+        return request.authToken == null | request.teamColor == null;
+    }
 }

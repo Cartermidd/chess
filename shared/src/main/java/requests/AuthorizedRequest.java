@@ -10,4 +10,8 @@ public class AuthorizedRequest {
     public String getAuthToken(){
         return this.authToken;
     }
+
+    public static boolean misformatted(AuthorizedRequest request){
+        return request.authToken == null;
+    }
 }

@@ -21,6 +21,7 @@ public class RegisterHandler {
         try {
             RegisterRequest request = new Gson().fromJson(ctx.body(), RegisterRequest.class);
             LoginResult result = userService.register(request);
+            ctx.status(200);
             ctx.result(new Gson().toJson(result));
         } catch(DataAccessException e) {
             ctx.status(400);

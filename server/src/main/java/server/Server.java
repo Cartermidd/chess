@@ -25,13 +25,9 @@ public class Server {
     public Server() {
         MemoryDataAccess dao = new MemoryDataAccess();
 
-        UserService userService = new UserService(dao, dao);
-        GameService gameService = new GameService(dao, dao);
-        ClearService clearService = new ClearService(dao);
-
-        this.userService = userService;
-        this.gameService = gameService;
-        this.clearService = clearService;
+        this.userService = new UserService(dao, dao);
+        this.gameService = new GameService(dao, dao);
+        this.clearService = new ClearService(dao, dao, dao);
         this.RegisterHandler = new RegisterHandler(userService);
         this.LoginHandler = new LoginHandler(userService);
         this.LogoutHandler = new LogoutHandler(userService);
@@ -65,11 +61,11 @@ public class Server {
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .post("/user", RegisterHandler::register)
-                .post("/session", LoginHandler::login)
-                .delete("session", LogoutHandler::logout)
-                .get("/game", ListGamesHandler::listGames)
-                .post("/game", CreateGameHandler::createGame)
-                .put("/game", JoinGameHandler::joinGame)
+//                .post("/session", LoginHandler::login)
+//                .delete("session", LogoutHandler::logout)
+//                .get("/game", ListGamesHandler::listGames)
+//                .post("/game", CreateGameHandler::createGame)
+//                .put("/game", JoinGameHandler::joinGame)
                 .delete("/db", ClearHandler::clear);
 
     }
@@ -85,23 +81,6 @@ public class Server {
 
     public void stop(){
         javalin.stop();
-    }
-
-
-
-    private void createGame(Context ctx) throws DataAccessException {
-        GameObject game = new Gson().fromJson(ctx.body(), GameObject.class);
-        game = service.addGame(game);
-        ctx.result(new Gson().toJson(game));
-    }
-
-    private void joinGame(Context ctx) throws DataAccessException {
-        ctx.result(service.joinGame().toString());
-    }
-
-    private void clear(Context ctx) throws DataAccessException{
-        service.clearDB();
-        ctx.status(204);
     }
 
 }

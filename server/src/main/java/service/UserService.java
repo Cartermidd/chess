@@ -35,9 +35,12 @@ public class UserService {
         return new LoginResult(user.getUsername(), authToken);
     }
 
-    public LoginResult login(LoginRequest){}
+    public LoginResult login(LoginRequest request){
+        return new LoginResult("Todd","Toddathy");
+    }
 
-    public void logout(AuthorizedRequest){
+    public GenericSuccessfulResult logout(AuthorizedRequest request) throws DataAccessException, UnauthorizedException {
+        return new GenericSuccessfulResult();
     }
 
 

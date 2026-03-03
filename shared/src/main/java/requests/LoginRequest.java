@@ -9,7 +9,6 @@ public class LoginRequest {
         this.username = username;
     }
 
-
     public String getUsername(){
         return this.username;
     }
@@ -17,4 +16,7 @@ public class LoginRequest {
         return this.password;
     }
 
+    public static boolean misformatted(LoginRequest request){
+        return request.username == null | request.password == null;
+    }
 }
