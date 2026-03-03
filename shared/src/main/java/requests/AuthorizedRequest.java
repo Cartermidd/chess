@@ -12,6 +12,7 @@ public class AuthorizedRequest {
     }
 
     public static boolean misformatted(AuthorizedRequest request){
+        if (request == null){return false;}
         return request.authToken == null;
     }
 }

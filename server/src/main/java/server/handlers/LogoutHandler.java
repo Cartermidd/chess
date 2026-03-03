@@ -5,7 +5,6 @@ import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import exceptions.UnauthorizedException;
 import requests.AuthorizedRequest;
-import requests.RegisterRequest;
 import results.GenericSuccessfulResult;
 import service.UserService;
 
@@ -18,14 +17,19 @@ public class LogoutHandler {
 
     public void logout(Context ctx) {
         try {
-            AuthorizedRequest auth = new Gson().fromJson(ctx.body(), AuthorizedRequest.class);
-            ctx.result(userService.logout(auth).toString());
-        }catch (DataAccessException _){
+            String authToken = ctx.header("Authorization");
+            userService.logout(authToken);
+            ctx.status(200);
+            ctx.result(new Gson().toJson(new GenericSuccessfulResult()));
+            ctx.contentType("application/json");
+        } catch(DataAccessException e) {
             ctx.status(400);
-            ctx.result("Data Access Error");
+            ctx.result(new Gson().toJson(new ErrorResponse(e.toString())));
+            ctx.contentType("application/json");
         } catch (UnauthorizedException e){
             ctx.status(401);
-            ctx.result("Error: unauthorized");
+            ctx.result(new Gson().toJson(new ErrorResponse("Error: Unauthorized")));
+            ctx.contentType("application/json");
         }
     }
 }

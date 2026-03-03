@@ -6,7 +6,6 @@ import results.CreateGameResult;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
@@ -14,7 +13,7 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
     private final Map<String, UserData> usersByUsername = new HashMap<>();
     private final Map<String, AuthData> usersByAuth = new HashMap<>();
     private final Map<Integer, GameData> gameById = new HashMap<>();
-    private Integer gameId = 0;
+    private Integer gameId = 1;
 
 
     @Override
@@ -22,7 +21,7 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
         try {
             usersByUsername.put(user.getUsername(), user);
         } catch (Exception e) {
-            throw new DataAccessException(e.toString());
+            throw new DataAccessException(e + " Data Access Error");
         }
     }
 
@@ -31,7 +30,7 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
         try {
             return usersByUsername.get(username);
         } catch (Exception e) {
-            throw new DataAccessException(e.toString());
+            throw new DataAccessException(e + " Data Access Error");
         }
     }
 
@@ -41,7 +40,7 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
         try {
             usersByAuth.put(authData.authToken(), authData);
         } catch (Exception e) {
-            throw new DataAccessException(e.toString());
+            throw new DataAccessException(e + " Data Access Error");
         }
     }
 
@@ -50,7 +49,7 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
         try {
             return usersByAuth.get(authToken);
         } catch (Exception e) {
-            throw new DataAccessException(e.toString());
+            throw new DataAccessException(e + " Data Access Error");
         }
     }
 
@@ -59,7 +58,7 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
         try {
             usersByAuth.remove(authToken);
         } catch (Exception e) {
-            throw new DataAccessException(e.toString());
+            throw new DataAccessException(e + " Data Access Error");
         }
     }
 
@@ -71,7 +70,7 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
             gameId++;
             return new CreateGameResult(newGameId);
         } catch (Exception e) {
-            throw new DataAccessException(e.toString());
+            throw new DataAccessException(e + " Data Access Error");
         }
     }
 
@@ -80,7 +79,7 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
         try {
             return gameById.values();
         } catch (Exception e) {
-            throw new DataAccessException(e.toString());
+            throw new DataAccessException(e + " Data Access Error");
         }
     }
 
@@ -91,7 +90,7 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
             this.usersByUsername.clear();
             this.gameById.clear();
         } catch (Exception e) {
-            throw new DataAccessException(e.toString());
+            throw new DataAccessException(e + " Data Access Error");
         }
     }
 }

@@ -21,11 +21,11 @@ public class UserService {
 
     public LoginResult register(RegisterRequest request) throws DataAccessException, ImproperRequestException, AlreadyTakenException {
         if (RegisterRequest.misformatted(request)) {
-            throw new ImproperRequestException("misformatted request");
+            throw new ImproperRequestException("Error: misformatted request");
         }
         if (userDAO.findByUsername(request.getUsername()) != null)
         {
-            throw new AlreadyTakenException("Username Taken");
+            throw new AlreadyTakenException("Error: Username Taken");
         }
         String authToken = GenerateAuthToken.generateAuthToken();
 
@@ -40,25 +40,28 @@ public class UserService {
 
     public LoginResult login(LoginRequest request) throws DataAccessException, UserDoesNotExistException, ImproperRequestException, IncorrectPasswordException{
         if (LoginRequest.misformatted(request)){
-            throw new ImproperRequestException("misformatted request");
+            throw new ImproperRequestException("Error: misformatted request");
         }
         UserData user = userDAO.findByUsername(request.getUsername());
         if (user == null){
-            throw new UserDoesNotExistException("No User with that username");
+            throw new UserDoesNotExistException("Error: No User with that username");
         }
         if(Objects.equals(user.getPassword(), request.getPassword())){
             String authToken = GenerateAuthToken.generateAuthToken();
             authDAO.create(new AuthData(user.getUsername(),authToken));
             return new LoginResult(user.getUsername(),authToken);
         } else {
-            throw new IncorrectPasswordException("Incorrect Password");
+            throw new IncorrectPasswordException("Error: Incorrect Password");
         }
     }
 
-    public GenericSuccessfulResult logout(AuthorizedRequest request) throws DataAccessException, UnauthorizedException {
-        AuthData data = authDAO.findByAuth(request.getAuthToken());
+    public GenericSuccessfulResult logout(String authToken) throws DataAccessException, UnauthorizedException {
+        if (authToken == null){
+            throw new UnauthorizedException("Error: No AuthToken");
+        }
+        AuthData data = authDAO.findByAuth(authToken);
         if (data == null){
-            throw new UnauthorizedException("Unauthorized Error");
+            throw new UnauthorizedException("Error: Unauthorized");
         } else {
             authDAO.deleteAuth(data.authToken());
             return new GenericSuccessfulResult();

@@ -23,15 +23,19 @@ public class RegisterHandler {
             LoginResult result = userService.register(request);
             ctx.status(200);
             ctx.result(new Gson().toJson(result));
+            ctx.contentType("application/json");
         } catch(DataAccessException e) {
             ctx.status(400);
-            ctx.result("Data Access Error");
+            ctx.result(new Gson().toJson(new ErrorResponse(e.toString())));
+            ctx.contentType("application/json");
         } catch(ImproperRequestException e){
             ctx.status(400);
-            ctx.result("Error: bad request");
+            ctx.result(new Gson().toJson(new ErrorResponse("Error: Misformatted Request")));
+            ctx.contentType("application/json");
         } catch(AlreadyTakenException e){
             ctx.status(403);
-            ctx.result("Error: username already taken");
+            ctx.result(new Gson().toJson(new ErrorResponse(e.toString())));
+            ctx.contentType("application/json");
         }
     }
 

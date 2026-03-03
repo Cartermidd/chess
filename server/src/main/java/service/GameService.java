@@ -23,7 +23,7 @@ public class GameService {
 
     public Collection<GameData> listGames(AuthorizedRequest request) throws UnauthorizedException, DataAccessException {
         if (authDAO.findByAuth(request.getAuthToken()) == null){
-            throw new UnauthorizedException("Unauthorized Error");
+            throw new UnauthorizedException("Error: Unauthorized");
         }
         return gameDAO.listGames();
     }
@@ -32,10 +32,10 @@ public class GameService {
 
     public CreateGameResult createGame(CreateGameRequest request) throws UnauthorizedException, DataAccessException, ImproperRequestException{
         if(CreateGameRequest.misformatted(request)){
-            throw new ImproperRequestException("Misformatted Request");
+            throw new ImproperRequestException("Error: Misformatted Request");
         }
         if (authDAO.findByAuth(request.getAuthToken()) == null){
-            throw new UnauthorizedException("Unauthorized Error");
+            throw new UnauthorizedException("Error: Unauthorized");
         }
         return gameDAO.createGame(request.getGameName());
     }

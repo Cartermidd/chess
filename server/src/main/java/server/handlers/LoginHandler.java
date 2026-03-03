@@ -7,9 +7,11 @@ import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import exceptions.IncorrectPasswordException;
 import exceptions.UserDoesNotExistException;
+import org.eclipse.jetty.util.log.Log;
 import requests.LoginRequest;
 import results.LoginResult;
 import service.UserService;
+
 
 public class LoginHandler {
     UserService service;
@@ -21,21 +23,27 @@ public class LoginHandler {
 
     public void login(Context ctx) {
         try {
-            UserData user = new Gson().fromJson(ctx.body(), UserData.class);
-            LoginResult result = service.login(new LoginRequest(user.getUsername(),user.getPassword()));
+            LoginRequest request = new Gson().fromJson(ctx.body(), LoginRequest.class);
+            LoginResult result = service.login(request);
+            ctx.status(200);
             ctx.result(new Gson().toJson(result));
-        }catch (DataAccessException _){
+            ctx.contentType("application/json");
+        } catch(DataAccessException e) {
             ctx.status(400);
-            ctx.result("Data Access Error");
+            ctx.result(new Gson().toJson(new ErrorResponse(e.toString())));
+            ctx.contentType("application/json");
         } catch (UserDoesNotExistException e){
-            ctx.status(400);
-            ctx.result("Error: bad request");
+            ctx.status(401);
+            ctx.result(new Gson().toJson(new ErrorResponse("Error: User Does Not Exist")));
+            ctx.contentType("application/json");
         } catch (IncorrectPasswordException e){
-            ctx.status(400);
-            ctx.result("Error: Incorrect Password");
+            ctx.status(401);
+            ctx.result(new Gson().toJson(new ErrorResponse("Error: Incorrect Password")));
+            ctx.contentType("application/json");
         } catch (ImproperRequestException e) {
             ctx.status(400);
-            ctx.result(e.toString());
+            ctx.result(new Gson().toJson(new ErrorResponse("Error: Misformatted Request")));
+            ctx.contentType("application/json");
         }
     }
 

@@ -61,11 +61,11 @@ public class Server {
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .post("/user", RegisterHandler::register)
-//                .post("/session", LoginHandler::login)
-//                .delete("/session", LogoutHandler::logout)
-//                .get("/game", ListGamesHandler::listGames)
-//                .post("/game", CreateGameHandler::createGame)
-//                .put("/game", JoinGameHandler::joinGame)
+                .post("/session", LoginHandler::login)
+                .delete("/session", LogoutHandler::logout)
+                .get("/game", ListGamesHandler::listGames)
+                .post("/game", CreateGameHandler::createGame)
+                .put("/game", JoinGameHandler::joinGame)
                 .delete("/db", ClearHandler::clear);
 
     }
