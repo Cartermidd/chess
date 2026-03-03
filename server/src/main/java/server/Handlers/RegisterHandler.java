@@ -5,14 +5,14 @@ import Models.UserData;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
-import server.exceptions.*;
-import service.*;
+import server.exceptions.AlreadyTakenException;
+import server.exceptions.ImproperRequestException;
+import service.Service;
 
-
-public class UserHandler {
+public class RegisterHandler {
     Service service;
 
-    public UserHandler(Service service){
+    public RegisterHandler(Service service) {
         this.service = service;
     }
 
@@ -32,9 +32,6 @@ public class UserHandler {
             ctx.result("Error: username already taken");
         }
     }
-
-
-
 
 
 }

@@ -16,15 +16,7 @@ public class GameHandler {
         this.service = service;
     }
 
-
-
-
-
-
-
-
-    private void listGames(Context ctx) throws DataAccessException {
-
+    public createGame(Context ctx){
+        service.createGame(ctx);
     }
-
 }

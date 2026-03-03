@@ -11,27 +11,35 @@ import server.Handlers.*;
 public class Server {
     private final Service service;
     private final Javalin javalin;
-    private final UserHandler UserHandler;
-    private final AuthHandler AuthHandler;
-    private final GameHandler GameHandler;
+    private final RegisterHandler RegisterHandler;
+    private final LoginHandler LoginHandler;
+    private final LogoutHandler LogoutHandler;
+    private final ListGamesHandler ListGamesHandler;
+    private final CreateGameHandler CreateGameHandler;
+    private final JoinGameHandler JoinGameHandler;
+    private final ClearHandler ClearHandler;
+
 
     public Server() { this(new Service(new MemoryDataAccess()));}
 
     public Server(Service service) {
         this.service = service;
-        this.UserHandler = new UserHandler(service);
-        this.AuthHandler = new AuthHandler(service);
-        this.GameHandler = new GameHandler(service);
-
+        this.RegisterHandler = RegisterHandler(service);
+        this.LoginHandler = LoginHandler(service);
+        this.LogoutHandler = LogoutHandler(service);
+        this.ListGamesHandler = ListGamesHandler(service);
+        this.CreateGameHandler = CreateGameHandler(service);
+        this.JoinGameHandler = JoinGameHandler(service);
+        this.ClearHandler = ClearHandler(service);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
-                .post("/user", UserHandler::register)
-                .post("/session", UserHandler::login)
-                .delete("session", AuthHandler::logout)
-                .get("/game", AuthHandler::listGames)
-                .post("/game", this::createGame)
-                .put("/game", this::joinGame)
-                .delete("/db", this::clear);
+                .post("/user", RegisterHandler::register)
+                .post("/session", LoginHandler::login)
+                .delete("session", LogoutHandler::logout)
+                .get("/game", ListGamesHandler::listGames)
+                .post("/game", CreateGameHandler::createGame)
+                .put("/game", JoinGameHandler::joinGame)
+                .delete("/db", ClearHandler::clear);
 
     }
 
