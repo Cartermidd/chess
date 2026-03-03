@@ -1,25 +1,26 @@
-package server.Handlers;
+package server.handlers;
 
-import Models.AuthData;
-import Models.UserData;
+
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
-import server.exceptions.AlreadyTakenException;
-import server.exceptions.ImproperRequestException;
-import service.Service;
+import exceptions.AlreadyTakenException;
+import exceptions.ImproperRequestException;
+import requests.RegisterRequest;
+import results.LoginResult;
+import service.RegisterService;
 
 public class RegisterHandler {
-    Service service;
+    RegisterService service;
 
-    public RegisterHandler(Service service) {
+    public RegisterHandler(RegisterService service) {
         this.service = service;
     }
 
     public void register(Context ctx) {
         try {
-            UserData user = new Gson().fromJson(ctx.body(), UserData.class);
-            AuthData result = service.register(user);
+            RegisterRequest request = new Gson().fromJson(ctx.body(), RegisterRequest.class);
+            LoginResult result = service.register(request);
             ctx.result(new Gson().toJson(result));
         } catch(DataAccessException e) {
             ctx.status(400);

@@ -1,6 +1,6 @@
 package dataaccess;
 
-import Models.*;
+import models.*;
 
 
 public interface DataAccess {

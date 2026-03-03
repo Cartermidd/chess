@@ -1,6 +1,6 @@
 package dataaccess;
 
-import Models.*;
+import models.*;
 import chess.*;
 import java.util.HashMap;
 

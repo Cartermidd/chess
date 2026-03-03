@@ -1,9 +1,6 @@
 package service;
 
-import Models.*;
-import chess.*;
 import dataaccess.*;
-import java.util.UUID;
 
 public class Service {
 

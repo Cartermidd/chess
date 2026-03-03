@@ -6,7 +6,7 @@ import io.javalin.*;
 import dataaccess.MemoryDataAccess;
 import io.javalin.http.Context;
 import service.Service;
-import server.Handlers.*;
+import server.handlers.*;
 
 public class Server {
     private final Service service;
@@ -24,13 +24,13 @@ public class Server {
 
     public Server(Service service) {
         this.service = service;
-        this.RegisterHandler = RegisterHandler(service);
-        this.LoginHandler = LoginHandler(service);
-        this.LogoutHandler = LogoutHandler(service);
-        this.ListGamesHandler = ListGamesHandler(service);
-        this.CreateGameHandler = CreateGameHandler(service);
-        this.JoinGameHandler = JoinGameHandler(service);
-        this.ClearHandler = ClearHandler(service);
+        this.RegisterHandler = new RegisterHandler(service);
+        this.LoginHandler = new LoginHandler(service);
+        this.LogoutHandler = new LogoutHandler(service);
+        this.ListGamesHandler = new ListGamesHandler(service);
+        this.CreateGameHandler =  new CreateGameHandler(service);
+        this.JoinGameHandler = new JoinGameHandler(service);
+        this.ClearHandler = new ClearHandler(service);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .post("/user", RegisterHandler::register)

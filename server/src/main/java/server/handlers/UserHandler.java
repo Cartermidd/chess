@@ -1,11 +1,12 @@
-package server.Handlers;
+package server.handlers;
 
-import Models.AuthData;
-import Models.UserData;
+import models.AuthData;
+import models.UserData;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import exceptions.AlreadyTakenException;
+import exceptions.ImproperRequestException;
 import io.javalin.http.Context;
-import server.exceptions.*;
 import service.*;
 
 

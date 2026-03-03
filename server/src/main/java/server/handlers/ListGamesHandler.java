@@ -1,8 +1,8 @@
-package server.Handlers;
+package server.handlers;
 
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
-import server.exceptions.UnauthorizedException;
+import exceptions.UnauthorizedException;
 import service.Service;
 
 public class ListGamesHandler {

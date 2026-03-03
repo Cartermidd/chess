@@ -1,11 +1,11 @@
-package server.Handlers;
+package server.handlers;
 
-import Models.UserData;
+import models.UserData;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
-import server.exceptions.IncorrectPasswordException;
-import server.exceptions.UserDoesNotExistException;
+import exceptions.IncorrectPasswordException;
+import exceptions.UserDoesNotExistException;
 import service.Service;
 
 public class LoginHandler {
