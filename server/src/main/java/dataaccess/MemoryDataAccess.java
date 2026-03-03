@@ -1,5 +1,6 @@
 package dataaccess;
 
+import Models.*;
 import chess.*;
 import java.util.HashMap;
 
@@ -14,9 +15,58 @@ public class MemoryDataAccess implements DataAccess {
         return game;
     }
 
-    public gameList listGames() {return new gameList(chessGames.values());}
+    @Override
+    public UserData getUser(String userName) throws DataAccessException {
+        try{
+            if (userName in DB){
+                UserData user = DB(userName);
+                return user;
+            }else{
+                return null;
+            }
+        } catch(DataAccessException e){
+            throw e("getUser Access Error");
+        }
+    }
+
+    @Override
+    public void createUser(UserData user) throws DataAccessException {
+
+    }
+
+    @Override
+    public AuthData createAuth(AuthData authdata) throws DataAccessException {
+        return null;
+    }
+
+    @Override
+    public AuthData getAuth(String token) throws DataAccessException {
+        return null;
+    }
+
+    @Override
+    public void deleteAuth(AuthData token) throws DataAccessException {
+
+    }
+
+    public GameList listGames() {return new GameList(chessGames.values());}
+
+    @Override
+    public GameData createGame(GameData game) throws DataAccessException {
+        return null;
+    }
 
     public ChessGame getGame(int id){return chessGames.get(id);}
+
+    @Override
+    public GameData updateGame(GameData game) throws DataAccessException {
+        return null;
+    }
+
+    @Override
+    public void clear() throws DataAccessException {
+
+    }
 
     public void deleteGame(int id){chessGames.remove(id);}
 
