@@ -3,13 +3,20 @@ package service;
 import dataaccess.*;
 
 public class ClearService {
-    private final DataAccess dataAccess;
+    private final UserDAO userDAO;
+    private final GameDAO gameDAO;
+    private final AuthDAO authDAO;
 
-    public ClearService(DataAccess dataAccess){this.dataAccess = dataAccess;}
-
-    public void clearDB() throws DataAccessException {
-        dataAccess.clear();
+    public ClearService(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
+        this.userDAO = userDAO;
+        this.gameDAO = gameDAO;
+        this.authDAO = authDAO;
     }
 
+    public void clearDB() throws DataAccessException {
+        userDAO.clear();
+        gameDAO.clear();
+        authDAO.clear();
+    }
 
 }

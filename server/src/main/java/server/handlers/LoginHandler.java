@@ -6,11 +6,12 @@ import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import exceptions.IncorrectPasswordException;
 import exceptions.UserDoesNotExistException;
+import service.UserService;
 
 public class LoginHandler {
-    Service service;
+    UserService service;
 
-    public LoginHandler(Service service){
+    public LoginHandler(UserService service){
         this.service = service;
     }
 

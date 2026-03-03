@@ -32,17 +32,36 @@ public class Server {
         this.userService = userService;
         this.gameService = gameService;
         this.clearService = clearService;
+        this.RegisterHandler = new RegisterHandler(userService);
+        this.LoginHandler = new LoginHandler(userService);
+        this.LogoutHandler = new LogoutHandler(userService);
+        this.ListGamesHandler = new ListGamesHandler(gameService);
+        this.CreateGameHandler =  new CreateGameHandler(gameService);
+        this.JoinGameHandler = new JoinGameHandler(gameService);
+        this.ClearHandler = new ClearHandler(clearService);
+
+        javalin = Javalin.create(config -> config.staticFiles.add("web"))
+                .post("/user", RegisterHandler::register)
+                .post("/session", LoginHandler::login)
+                .delete("session", LogoutHandler::logout)
+                .get("/game", ListGamesHandler::listGames)
+                .post("/game", CreateGameHandler::createGame)
+                .put("/game", JoinGameHandler::joinGame)
+                .delete("/db", ClearHandler::clear);
+
     }
 
-    public Server(Service service) {
-        this.service = service;
-        this.RegisterHandler = new RegisterHandler(service);
-        this.LoginHandler = new LoginHandler(service);
-        this.LogoutHandler = new LogoutHandler(service);
-        this.ListGamesHandler = new ListGamesHandler(service);
-        this.CreateGameHandler =  new CreateGameHandler(service);
-        this.JoinGameHandler = new JoinGameHandler(service);
-        this.ClearHandler = new ClearHandler(service);
+    public Server(UserService userService, GameService gameService, ClearService clearService) {
+        this.userService = userService;
+        this.gameService = gameService;
+        this.clearService = clearService;
+        this.RegisterHandler = new RegisterHandler(userService);
+        this.LoginHandler = new LoginHandler(userService);
+        this.LogoutHandler = new LogoutHandler(userService);
+        this.ListGamesHandler = new ListGamesHandler(gameService);
+        this.CreateGameHandler =  new CreateGameHandler(gameService);
+        this.JoinGameHandler = new JoinGameHandler(gameService);
+        this.ClearHandler = new ClearHandler(clearService);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .post("/user", RegisterHandler::register)

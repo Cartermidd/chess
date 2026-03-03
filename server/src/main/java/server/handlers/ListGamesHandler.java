@@ -3,11 +3,12 @@ package server.handlers;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import exceptions.UnauthorizedException;
+import service.GameService;
 
 public class ListGamesHandler {
-    Service service;
+    GameService service;
 
-    public ListGamesHandler(Service service){
+    public ListGamesHandler(GameService service){
         this.service = service;
     }
 

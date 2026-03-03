@@ -5,7 +5,7 @@ public class IncorrectPasswordException extends Exception {
         super(message);
     }
 
-    public UserDoesNotExistException(String message, Throwable ex) {
+    public IncorrectPasswordException(String message, Throwable ex) {
         super(message, ex);
     }
 }

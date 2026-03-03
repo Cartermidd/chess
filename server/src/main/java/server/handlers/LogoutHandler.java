@@ -3,11 +3,12 @@ package server.handlers;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import exceptions.UnauthorizedException;
+import service.UserService;
 
 public class LogoutHandler {
-    Service service;
+    UserService service;
 
-    public LogoutHandler(Service service){
+    public LogoutHandler(UserService service){
         this.service = service;
     }
 

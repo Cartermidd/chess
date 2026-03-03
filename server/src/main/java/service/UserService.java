@@ -1,28 +1,43 @@
 package service;
 
-import dataaccess.DataAccessException;
-import exceptions.AlreadyTakenException;
-import exceptions.ImproperRequestException;
-import requests.RegisterRequest;
-import results.LoginResult;
+import dataaccess.*;
+import exceptions.*;
+import models.*;
+import requests.*;
+import results.*;
 
 public class UserService {
 
+    private final UserDAO userDAO;
+    private final AuthDAO authDAO;
 
+    public UserService(UserDAO userDAO, AuthDAO authDAO) {
+        this.userDAO = userDAO;
+        this.authDAO = authDAO;
+    }
 
     public LoginResult register(RegisterRequest request) throws DataAccessException, ImproperRequestException, AlreadyTakenException {
         if (RegisterRequest.misformatted(request)) {
             throw new ImproperRequestException("misformatted request");
         }
-
-
-
-        if (/* username is already taken */)
+        if (userDAO.findByUsername(request.getUsername()) != null)
         {
             throw new AlreadyTakenException("Username Taken");
         }
+        String authToken = GenerateAuthToken.generateAuthToken();
 
-        return new LoginResult();
+        UserData user = new UserData(request.getUsername(), request.getPassword(), request.getEmail());
+        userDAO.create(user);
+
+        AuthData authUser = new AuthData(request.getUsername(), authToken);
+        authDAO.create(authUser);
+
+        return new LoginResult(user.getUsername(), authToken);
+    }
+
+    public LoginResult login(LoginRequest){}
+
+    public void logout(AuthorizedRequest){
     }
 
 

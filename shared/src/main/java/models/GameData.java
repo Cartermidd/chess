@@ -12,4 +12,8 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
         this.game = game;
     }
 
+    @Override
+    public int gameID() {
+        return gameID;
+    }
 }

@@ -11,11 +11,9 @@ import results.LoginResult;
 import service.UserService;
 
 public class RegisterHandler {
-    Service service;
     UserService userService;
 
-    public RegisterHandler(Service service, UserService userService) {
-        this.service = service;
+    public RegisterHandler(UserService userService) {
         this.userService = userService;
     }
 

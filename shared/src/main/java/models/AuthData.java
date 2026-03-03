@@ -7,4 +7,13 @@ public record AuthData(String userName, String authToken) {
         this.authToken = authToken;
     }
 
+    @Override
+    public String userName() {
+        return userName;
+    }
+
+    @Override
+    public String authToken() {
+        return authToken;
+    }
 }
