@@ -3,8 +3,11 @@ package service;
 import dataaccess.*;
 import exceptions.*;
 import models.*;
+import org.eclipse.jetty.server.Authentication;
 import requests.*;
 import results.*;
+
+import java.util.Objects;
 
 public class UserService {
 
@@ -35,12 +38,31 @@ public class UserService {
         return new LoginResult(user.getUsername(), authToken);
     }
 
-    public LoginResult login(LoginRequest request){
-        return new LoginResult("Todd","Toddathy");
+    public LoginResult login(LoginRequest request) throws DataAccessException, UserDoesNotExistException, ImproperRequestException, IncorrectPasswordException{
+        if (LoginRequest.misformatted(request)){
+            throw new ImproperRequestException("misformatted request");
+        }
+        UserData user = userDAO.findByUsername(request.getUsername());
+        if (user == null){
+            throw new UserDoesNotExistException("No User with that username");
+        }
+        if(Objects.equals(user.getPassword(), request.getPassword())){
+            String authToken = GenerateAuthToken.generateAuthToken();
+            authDAO.create(new AuthData(user.getUsername(),authToken));
+            return new LoginResult(user.getUsername(),authToken);
+        } else {
+            throw new IncorrectPasswordException("Incorrect Password");
+        }
     }
 
     public GenericSuccessfulResult logout(AuthorizedRequest request) throws DataAccessException, UnauthorizedException {
-        return new GenericSuccessfulResult();
+        AuthData data = authDAO.findByAuth(request.getAuthToken());
+        if (data == null){
+            throw new UnauthorizedException("Unauthorized Error");
+        } else {
+            authDAO.deleteAuth(data.authToken());
+            return new GenericSuccessfulResult();
+        }
     }
 
 

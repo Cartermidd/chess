@@ -46,9 +46,18 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
     }
 
     @Override
-    public AuthData findByAuth(String authtoken) throws DataAccessException {
+    public AuthData findByAuth(String authToken) throws DataAccessException {
         try {
-            return usersByAuth.get(authtoken);
+            return usersByAuth.get(authToken);
+        } catch (Exception e) {
+            throw new DataAccessException(e.toString());
+        }
+    }
+
+    @Override
+    public void deleteAuth(String authToken) throws DataAccessException {
+        try {
+            usersByAuth.remove(authToken);
         } catch (Exception e) {
             throw new DataAccessException(e.toString());
         }

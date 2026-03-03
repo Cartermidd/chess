@@ -62,7 +62,7 @@ public class Server {
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .post("/user", RegisterHandler::register)
 //                .post("/session", LoginHandler::login)
-//                .delete("session", LogoutHandler::logout)
+//                .delete("/session", LogoutHandler::logout)
 //                .get("/game", ListGamesHandler::listGames)
 //                .post("/game", CreateGameHandler::createGame)
 //                .put("/game", JoinGameHandler::joinGame)
@@ -70,9 +70,9 @@ public class Server {
 
     }
 
-    public Server run(int desiredPort) {
+    public int run(int desiredPort) {
         javalin.start(desiredPort);
-        return this;
+        return javalin.port();
     }
 
     public int port(){

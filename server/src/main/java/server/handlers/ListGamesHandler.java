@@ -27,9 +27,6 @@ public class ListGamesHandler {
         }catch (UnauthorizedException e){
             ctx.status(401);
             ctx.result("Error: unauthorized");
-        } catch (ImproperRequestException e) {
-            ctx.status(400);
-            ctx.result("Improper Request");
         }
     }
 

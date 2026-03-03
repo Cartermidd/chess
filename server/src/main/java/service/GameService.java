@@ -21,10 +21,7 @@ public class GameService {
         this.gameDAO = gameDAO;
     }
 
-    public Collection<GameData> listGames(AuthorizedRequest request) throws UnauthorizedException, DataAccessException, ImproperRequestException {
-        if (AuthorizedRequest.misformatted(request)){
-            throw new ImproperRequestException("Misformatted Request");
-        }
+    public Collection<GameData> listGames(AuthorizedRequest request) throws UnauthorizedException, DataAccessException {
         if (authDAO.findByAuth(request.getAuthToken()) == null){
             throw new UnauthorizedException("Unauthorized Error");
         }

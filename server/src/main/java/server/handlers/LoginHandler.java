@@ -1,5 +1,6 @@
 package server.handlers;
 
+import exceptions.ImproperRequestException;
 import models.UserData;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
@@ -32,6 +33,9 @@ public class LoginHandler {
         } catch (IncorrectPasswordException e){
             ctx.status(400);
             ctx.result("Error: Incorrect Password");
+        } catch (ImproperRequestException e) {
+            ctx.status(400);
+            ctx.result(e.toString());
         }
     }
 
