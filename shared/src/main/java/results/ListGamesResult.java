@@ -4,10 +4,10 @@ import models.GameData;
 
 import java.util.Collection;
 
-public class GetGamesResult {
+public class ListGamesResult {
     Collection<GameData> games;
 
-    public GetGamesResult(Collection<GameData> games) {
+    public ListGamesResult(Collection<GameData> games) {
         this.games = games;
     }
 

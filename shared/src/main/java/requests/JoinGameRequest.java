@@ -3,30 +3,24 @@ package requests;
 import chess.ChessGame;
 
 public class JoinGameRequest {
-    String authToken;
-    ChessGame.TeamColor teamColor;
-    int gameId;
+    ChessGame.TeamColor playerColor;
+    Integer gameID;
 
-    public JoinGameRequest(String authToken, ChessGame.TeamColor teamColor, int gameId) {
-        this.authToken = authToken;
-        this.teamColor = teamColor;
-        this.gameId = gameId;
+    public JoinGameRequest(ChessGame.TeamColor playerColor, Integer gameID) {
+        this.playerColor = playerColor;
+        this.gameID = gameID;
     }
 
 
-    public String getAuthToken() {
-        return authToken;
-    }
-
-    public ChessGame.TeamColor getTeamColor() {
-        return teamColor;
+    public ChessGame.TeamColor getPlayerColor() {
+        return playerColor;
     }
 
     public int getGameId() {
-        return gameId;
+        return gameID;
     }
 
     public static boolean misformatted(JoinGameRequest request){
-        return request.authToken == null | request.teamColor == null;
+        return request.playerColor == null | request.gameID == null;
     }
 }

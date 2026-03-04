@@ -3,6 +3,7 @@ package dataaccess;
 import models.*;
 import chess.*;
 import results.CreateGameResult;
+import results.ListGamesResult;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -75,10 +76,38 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
     }
 
     @Override
-    public Collection<GameData> listGames() throws DataAccessException {
+    public ListGamesResult listGames() throws DataAccessException {
         try {
-            return gameById.values();
+            Collection<GameData> games = gameById.values();
+            return new ListGamesResult(games);
         } catch (Exception e) {
+            throw new DataAccessException(e + " Data Access Error");
+        }
+    }
+
+    @Override
+    public GameData findByID(Integer ID) throws DataAccessException {
+        try {
+            return gameById.get(ID);
+        } catch (Exception e) {
+            throw new DataAccessException(e + " Data Access Error");
+        }
+    }
+
+    @Override
+    public void updateGame(Integer ID, ChessGame.TeamColor color, String username) throws DataAccessException {
+        try{
+            GameData game = gameById.get(ID);
+            gameById.remove(ID);
+            if (color == ChessGame.TeamColor.BLACK){
+                GameData updatedGame = new GameData(ID, game.whiteUsername(), username, game.gameName(), game.game());
+                gameById.put(ID, updatedGame);
+            }
+            if (color == ChessGame.TeamColor.WHITE){
+                GameData updatedGame = new GameData(ID, username, game.blackUsername(), game.gameName(), game.game());
+                gameById.put(ID, updatedGame);
+            }
+        } catch(Exception e){
             throw new DataAccessException(e + " Data Access Error");
         }
     }

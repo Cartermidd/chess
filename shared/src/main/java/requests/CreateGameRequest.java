@@ -1,17 +1,10 @@
 package requests;
 
 public class CreateGameRequest {
-    String authToken;
     String gameName;
 
-    public CreateGameRequest(String authToken, String gameName) {
-        this.authToken = authToken;
+    public CreateGameRequest(String gameName) {
         this.gameName = gameName;
-    }
-
-
-    public String getAuthToken() {
-        return authToken;
     }
 
     public String getGameName() {
@@ -21,7 +14,7 @@ public class CreateGameRequest {
 
 
     public static boolean misformatted(CreateGameRequest request){
-        return request.authToken == null | request.gameName == null;
+        return request.gameName == null;
     }
 
 }

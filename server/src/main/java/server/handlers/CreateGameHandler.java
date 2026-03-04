@@ -1,37 +1,43 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
+import exceptions.ImproperRequestException;
+import exceptions.UnauthorizedException;
 import requests.CreateGameRequest;
 import requests.RegisterRequest;
+import results.CreateGameResult;
 import service.GameService;
-import service.UserService;
 
 import io.javalin.http.Context;
 
 public class CreateGameHandler {
     GameService gameService;
-    UserService userService;
 
-    public CreateGameHandler(GameService gameService, UserService userService) {
+    public CreateGameHandler(GameService gameService) {
         this.gameService = gameService;
-        this.userService = userService;
     }
 
     public void createGame(Context ctx){
         try{
             String authToken = ctx.header("Authorization");
-            userService.findByAuth
-
-
-
-
-
-            CreateGameRequest request = new Gson().fromJson(ctx.body(), CreateGameRequest.class);
-            ctx.result(gameService.createGame(request).toString());
+            CreateGameRequest gameRequest = new Gson().fromJson(ctx.body(), CreateGameRequest.class);
+            CreateGameResult result = gameService.createGame(authToken, gameRequest);
             ctx.status(200);
-        }catch(Exception e){
-            ctx.status();
-            ctx.result();
+            ctx.result(new Gson().toJson(result));
+            ctx.contentType("application/json");
+        } catch (UnauthorizedException e){
+            ctx.status(401);
+            ctx.result(new Gson().toJson(new ErrorResponse("Error: Unauthorized")));
+            ctx.contentType("application/json");
+        } catch(DataAccessException e) {
+            ctx.status(400);
+            ctx.result(new Gson().toJson(new ErrorResponse(e.toString())));
+            ctx.contentType("application/json");
+        } catch(ImproperRequestException e){
+            ctx.status(400);
+            ctx.result(new Gson().toJson(new ErrorResponse("Error: Misformatted Request")));
+            ctx.contentType("application/json");
         }
     }
 }

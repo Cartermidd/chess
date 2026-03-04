@@ -1,13 +1,13 @@
 package results;
 
 public class CreateGameResult {
-    int gameId;
+    int gameID;
 
-    public CreateGameResult(int gameId) {
-        this.gameId = gameId;
+    public CreateGameResult(int gameID) {
+        this.gameID = gameID;
     }
 
-    public int getGameId() {
-        return gameId;
+    public int getGameID() {
+        return gameID;
     }
 }

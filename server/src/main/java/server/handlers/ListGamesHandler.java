@@ -7,6 +7,8 @@ import io.javalin.http.Context;
 import exceptions.UnauthorizedException;
 import requests.AuthorizedRequest;
 import requests.CreateGameRequest;
+import results.GenericSuccessfulResult;
+import results.ListGamesResult;
 import service.GameService;
 
 public class ListGamesHandler {
@@ -19,8 +21,11 @@ public class ListGamesHandler {
 
     public void listGames(Context ctx) {
         try {
-            AuthorizedRequest request = new Gson().fromJson(ctx.body(), AuthorizedRequest.class);
-            ctx.result(service.listGames(request).toString());
+            String authToken = ctx.header("Authorization");
+            ListGamesResult result = service.listGames(authToken);
+            ctx.status(200);
+            ctx.result(new Gson().toJson(new GenericSuccessfulResult()));
+            ctx.contentType("application/json");
         }catch (DataAccessException _){
             ctx.status(400);
             ctx.result("Data Access Error");
