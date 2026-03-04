@@ -1,6 +1,7 @@
 package chess.piecemoves;
 import java.util.ArrayList;
 import chess.*;
+import static chess.piecemoves.MoveUntil.moveUntil;
 
 
 public class RookMoves {
@@ -16,34 +17,5 @@ public class RookMoves {
         return moves;
 
     }
-
-
-    private ArrayList<ChessMove> moveUntil(ChessBoard board, ChessPosition myPosition,
-                                           int rowDirection, int colDirection, ChessGame.TeamColor myColor){
-        int currRow = myPosition.getRow() + rowDirection;
-        int currCol = myPosition.getColumn() + colDirection;
-        ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
-
-        while (onBoard(currRow,currCol)){
-            chess.ChessPosition currPos = new ChessPosition(currRow, currCol);
-            if (board.getPiece(currPos) == null){
-                moves.add(new ChessMove(myPosition,currPos,null));
-            } else if (board.getPiece(currPos).getTeamColor() != myColor && board.getPiece(currPos).getPieceType() != ChessPiece.PieceType.KING){
-                moves.add(new ChessMove(myPosition,currPos,null));
-                break;
-            } else {
-                break;
-            }
-            currRow = currRow + rowDirection;
-            currCol = currCol + colDirection;
-        }
-        return moves;
-    }
-
-    private boolean onBoard(int row, int col){
-        if(row >= 1 & row <=8 & col >= 1 & col <= 8){return true;}
-        else {return false;}
-    }
-
 
 }
