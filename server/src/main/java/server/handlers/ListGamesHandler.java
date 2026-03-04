@@ -24,7 +24,7 @@ public class ListGamesHandler {
             String authToken = ctx.header("Authorization");
             ListGamesResult result = service.listGames(authToken);
             ctx.status(200);
-            ctx.result(new Gson().toJson(new GenericSuccessfulResult()));
+            ctx.result(new Gson().toJson(result));
             ctx.contentType("application/json");
         }catch (DataAccessException _){
             ctx.status(400);
