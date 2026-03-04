@@ -35,7 +35,8 @@ public class GameService {
 
 
 
-    public CreateGameResult createGame(String authToken, CreateGameRequest request) throws UnauthorizedException, DataAccessException, ImproperRequestException{
+    public CreateGameResult createGame(String authToken, CreateGameRequest request)
+            throws UnauthorizedException, DataAccessException, ImproperRequestException{
         if(!isAuthorized(authToken)){
             throw new UnauthorizedException("Error: Unauthorized");
         } else if(CreateGameRequest.misformatted(request)){
@@ -45,7 +46,8 @@ public class GameService {
         }
     }
 
-    public GenericSuccessfulResult joinGame(String authToken, JoinGameRequest request) throws DataAccessException, UnauthorizedException, ImproperRequestException, NoGameException, AlreadyTakenException{
+    public GenericSuccessfulResult joinGame(String authToken, JoinGameRequest request)
+            throws DataAccessException, UnauthorizedException, ImproperRequestException, NoGameException, AlreadyTakenException{
         if(!isAuthorized(authToken)){
             throw new UnauthorizedException("Error: Unauthorized");
         }

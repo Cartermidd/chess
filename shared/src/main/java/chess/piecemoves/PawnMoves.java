@@ -138,7 +138,8 @@ public class PawnMoves {
 
         if (onBoard(newRow,newCol)){
             if(board.getPiece(new ChessPosition(newRow,newCol)) != null){
-                if(board.getPiece(new ChessPosition(newRow,newCol)).getTeamColor() != myColor && board.getPiece(new ChessPosition(newRow,newCol)).getPieceType() != ChessPiece.PieceType.KING) {
+                if(board.getPiece(new ChessPosition(newRow,newCol)).getTeamColor() != myColor &&
+                        board.getPiece(new ChessPosition(newRow,newCol)).getPieceType() != ChessPiece.PieceType.KING) {
                     return true;
                 } else {
                     return false;

@@ -86,26 +86,26 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
     }
 
     @Override
-    public GameData findByID(Integer ID) throws DataAccessException {
+    public GameData findByID(Integer id) throws DataAccessException {
         try {
-            return gameById.get(ID);
+            return gameById.get(id);
         } catch (Exception e) {
             throw new DataAccessException(e + " Data Access Error");
         }
     }
 
     @Override
-    public void updateGame(Integer ID, ChessGame.TeamColor color, String username) throws DataAccessException {
+    public void updateGame(Integer id, ChessGame.TeamColor color, String username) throws DataAccessException {
         try{
-            GameData game = gameById.get(ID);
-            gameById.remove(ID);
+            GameData game = gameById.get(id);
+            gameById.remove(id);
             if (color == ChessGame.TeamColor.BLACK){
-                GameData updatedGame = new GameData(ID, game.whiteUsername(), username, game.gameName(), game.game());
-                gameById.put(ID, updatedGame);
+                GameData updatedGame = new GameData(id, game.whiteUsername(), username, game.gameName(), game.game());
+                gameById.put(id, updatedGame);
             }
             if (color == ChessGame.TeamColor.WHITE){
-                GameData updatedGame = new GameData(ID, username, game.blackUsername(), game.gameName(), game.game());
-                gameById.put(ID, updatedGame);
+                GameData updatedGame = new GameData(id, username, game.blackUsername(), game.gameName(), game.game());
+                gameById.put(id, updatedGame);
             }
         } catch(Exception e){
             throw new DataAccessException(e + " Data Access Error");

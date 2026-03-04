@@ -3,7 +3,6 @@ package service;
 import dataaccess.*;
 import exceptions.*;
 import models.*;
-import org.eclipse.jetty.server.Authentication;
 import requests.*;
 import results.*;
 
@@ -38,7 +37,8 @@ public class UserService {
         return new LoginResult(user.getUsername(), authToken);
     }
 
-    public LoginResult login(LoginRequest request) throws DataAccessException, UserDoesNotExistException, ImproperRequestException, IncorrectPasswordException{
+    public LoginResult login(LoginRequest request)
+            throws DataAccessException, UserDoesNotExistException, ImproperRequestException, IncorrectPasswordException{
         if (LoginRequest.misformatted(request)){
             throw new ImproperRequestException("Error: misformatted request");
         }
@@ -55,7 +55,7 @@ public class UserService {
         }
     }
 
-    public GenericSuccessfulResult logout(String authToken) throws DataAccessException, UnauthorizedException {
+    public void logout(String authToken) throws DataAccessException, UnauthorizedException {
         if (authToken == null){
             throw new UnauthorizedException("Error: No AuthToken");
         }
@@ -64,7 +64,7 @@ public class UserService {
             throw new UnauthorizedException("Error: Unauthorized");
         } else {
             authDAO.deleteAuth(data.authToken());
-            return new GenericSuccessfulResult();
+            new GenericSuccessfulResult();
         }
     }
 

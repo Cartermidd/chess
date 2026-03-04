@@ -4,20 +4,6 @@ package models;
 
 public record UserData(String userName, String password, String email) {
 
-    public UserData(String userName, String password, String email){
-        this.userName = userName;
-        this.password = password;
-        this.email = email;
-    }
-
-    public boolean validator(){
-        if(userName == null|password ==null){
-            return false;
-        } else {
-            return true;
-        }
-    }
-
     public String getUsername() {
         return userName;
     }
@@ -26,8 +12,5 @@ public record UserData(String userName, String password, String email) {
         return password;
     }
 
-    public String getEmail() {
-        return email;
-    }
 
 }

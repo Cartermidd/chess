@@ -58,7 +58,8 @@ public class ChessMove {
             return false;
         }
         ChessMove cast = (ChessMove) o; //casting o object to a ChessMove object
-        return (this.startPosition.equals(cast.startPosition) && this.endPosition.equals(cast.endPosition) && this.promotionPiece == cast.promotionPiece);
+        return (this.startPosition.equals(cast.startPosition) &&
+                this.endPosition.equals(cast.endPosition) && this.promotionPiece == cast.promotionPiece);
     }
 
     @Override

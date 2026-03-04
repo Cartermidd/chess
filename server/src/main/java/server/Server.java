@@ -11,13 +11,13 @@ public class Server {
     private final GameService gameService;
     private final ClearService clearService;
     private final Javalin javalin;
-    private final RegisterHandler RegisterHandler;
-    private final LoginHandler LoginHandler;
-    private final LogoutHandler LogoutHandler;
-    private final ListGamesHandler ListGamesHandler;
-    private final CreateGameHandler CreateGameHandler;
-    private final JoinGameHandler JoinGameHandler;
-    private final ClearHandler ClearHandler;
+    private final RegisterHandler registerHandler;
+    private final LoginHandler loginHandler;
+    private final LogoutHandler logoutHandler;
+    private final ListGamesHandler listGamesHandler;
+    private final CreateGameHandler createGameHandler;
+    private final JoinGameHandler joinGameHandler;
+    private final ClearHandler clearHandler;
 
 
     public Server() {
@@ -26,22 +26,22 @@ public class Server {
         this.userService = new UserService(dao, dao);
         this.gameService = new GameService(dao, dao);
         this.clearService = new ClearService(dao, dao, dao);
-        this.RegisterHandler = new RegisterHandler(userService);
-        this.LoginHandler = new LoginHandler(userService);
-        this.LogoutHandler = new LogoutHandler(userService);
-        this.ListGamesHandler = new ListGamesHandler(gameService);
-        this.CreateGameHandler =  new CreateGameHandler(gameService);
-        this.JoinGameHandler = new JoinGameHandler(gameService);
-        this.ClearHandler = new ClearHandler(clearService);
+        this.registerHandler = new RegisterHandler(userService);
+        this.loginHandler = new LoginHandler(userService);
+        this.logoutHandler = new LogoutHandler(userService);
+        this.listGamesHandler = new ListGamesHandler(gameService);
+        this.createGameHandler =  new CreateGameHandler(gameService);
+        this.joinGameHandler = new JoinGameHandler(gameService);
+        this.clearHandler = new ClearHandler(clearService);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
-                .post("/user", RegisterHandler::register)
-                .post("/session", LoginHandler::login)
-                .delete("session", LogoutHandler::logout)
-                .get("/game", ListGamesHandler::listGames)
-                .post("/game", CreateGameHandler::createGame)
-                .put("/game", JoinGameHandler::joinGame)
-                .delete("/db", ClearHandler::clear);
+                .post("/user", registerHandler::register)
+                .post("/session", loginHandler::login)
+                .delete("session", logoutHandler::logout)
+                .get("/game", listGamesHandler::listGames)
+                .post("/game", createGameHandler::createGame)
+                .put("/game", joinGameHandler::joinGame)
+                .delete("/db", clearHandler::clear);
 
     }
 
@@ -49,22 +49,22 @@ public class Server {
         this.userService = userService;
         this.gameService = gameService;
         this.clearService = clearService;
-        this.RegisterHandler = new RegisterHandler(userService);
-        this.LoginHandler = new LoginHandler(userService);
-        this.LogoutHandler = new LogoutHandler(userService);
-        this.ListGamesHandler = new ListGamesHandler(gameService);
-        this.CreateGameHandler =  new CreateGameHandler(gameService);
-        this.JoinGameHandler = new JoinGameHandler(gameService);
-        this.ClearHandler = new ClearHandler(clearService);
+        this.registerHandler = new RegisterHandler(userService);
+        this.loginHandler = new LoginHandler(userService);
+        this.logoutHandler = new LogoutHandler(userService);
+        this.listGamesHandler = new ListGamesHandler(gameService);
+        this.createGameHandler =  new CreateGameHandler(gameService);
+        this.joinGameHandler = new JoinGameHandler(gameService);
+        this.clearHandler = new ClearHandler(clearService);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
-                .post("/user", RegisterHandler::register)
-                .post("/session", LoginHandler::login)
-                .delete("/session", LogoutHandler::logout)
-                .get("/game", ListGamesHandler::listGames)
-                .post("/game", CreateGameHandler::createGame)
-                .put("/game", JoinGameHandler::joinGame)
-                .delete("/db", ClearHandler::clear);
+                .post("/user", registerHandler::register)
+                .post("/session", loginHandler::login)
+                .delete("/session", logoutHandler::logout)
+                .get("/game", listGamesHandler::listGames)
+                .post("/game", createGameHandler::createGame)
+                .put("/game", joinGameHandler::joinGame)
+                .delete("/db", clearHandler::clear);
 
     }
 

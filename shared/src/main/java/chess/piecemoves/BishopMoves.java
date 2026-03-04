@@ -18,7 +18,8 @@ public class BishopMoves {
     }
 
 
-    private ArrayList<ChessMove> moveUntil(ChessBoard board, ChessPosition myPosition, int rowDirection, int colDirection, ChessGame.TeamColor myColor){
+    private ArrayList<ChessMove> moveUntil(ChessBoard board, ChessPosition myPosition,
+                                           int rowDirection, int colDirection, ChessGame.TeamColor myColor){
         int currRow = myPosition.getRow() + rowDirection;
         int currCol = myPosition.getColumn() + colDirection;
         ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
