@@ -1,10 +1,8 @@
 package server;
 
 import com.google.gson.*;
-import dataaccess.DataAccessException;
 import io.javalin.*;
 import dataaccess.MemoryDataAccess;
-import io.javalin.http.Context;
 import server.handlers.*;
 import service.*;
 
@@ -72,10 +70,6 @@ public class Server {
 
     public int run(int desiredPort) {
         javalin.start(desiredPort);
-        return javalin.port();
-    }
-
-    public int port(){
         return javalin.port();
     }
 
