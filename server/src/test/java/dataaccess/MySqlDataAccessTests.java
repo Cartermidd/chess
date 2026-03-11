@@ -92,6 +92,14 @@ public class MySqlDataAccessTests {
             throw new RuntimeException(e);}
     }
 
+    @Test
+    @DisplayName("fail to delete")
+    public void failDeleteAuth(){
+        assertThrows(DataAccessException.class, ()->{
+            dataAccess.deleteAuth("abcd");
+        }, "Database should throw error when you try to delete a non-existent AuthToken");
+    }
+
 
 
 
