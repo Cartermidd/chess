@@ -27,7 +27,7 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
     public void create(AuthData authData) throws DataAccessException {
         var statement = "INSERT INTO authtokens (userName, authToken) VALUES (?, ?)";
         String json = new Gson().toJson(authData);
-        int id = updateAuthtokens(statement, authData.userName(), authData.authToken(), json);
+        int id = updateAuthTokens(statement, authData.userName(), authData.authToken(), json);
     }
 
     @Override
@@ -43,8 +43,9 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
     @Override
     public CreateGameResult createGame(String name) throws DataAccessException {//I need to serialize game
         var statement = "INSERT INTO authtokens (userName, authToken) VALUES (?, ?)";
-        String json = new Gson().toJson(authData);
-        int id = updateAuthtokens(statement, authData.userName(), authData.authToken(), json);
+//        String json = new Gson().toJson(authData);
+//        int id = updateAuthtokens(statement, authData.userName(), authData.authToken(), json);
+        return new CreateGameResult(1);
     }
 
     @Override
@@ -65,8 +66,8 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
     @Override
     public void create(UserData user) throws DataAccessException {//I need to hash the password
         var statement = "INSERT INTO users (userName, password, email) VALUES (?, ?, ?)";
-        String json = new Gson().toJson(authData);
-        int id = updateAuthtokens(statement, authData.userName(), authData.authToken(), json);
+//        String json = new Gson().toJson(authData);
+//        int id = updateAuthTokens(statement, authData.userName(), authData.authToken(), json);
     }
 
     @Override
@@ -80,15 +81,12 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
     }
 
 // let's make an update function for each database type!
-    private int updateAuthtokens(String statement, Object... params) throws DataAccessException {
+    private int updateAuthTokens(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
-                    else if (param == null) ps.setNull(i + 1, NULL);
+                    ps.setString(i + 1, param.toString());
                 }
                 ps.executeUpdate();
 
@@ -104,14 +102,14 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
         }
     }
 
-    private int updateUsers(String statement, Object... params) throws ResponseException {
+    private int updateUsers(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
                     if (param instanceof String p) ps.setString(i + 1, p);
                     else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
+//                    else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
                     else if (param == null) ps.setNull(i + 1, NULL);
                 }
                 ps.executeUpdate();
@@ -124,7 +122,7 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
                 return 0;
             }
         } catch (SQLException e) {
-            throw new ResponseException(ResponseException.Code.ServerError, String.format("unable to update database: %s, %s", statement, e.getMessage()));
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
 
@@ -135,7 +133,7 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
                     Object param = params[i];
                     if (param instanceof String p) ps.setString(i + 1, p);
                     else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
+//                    else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
                     else if (param == null) ps.setNull(i + 1, NULL);
                 }
                 ps.executeUpdate();
@@ -153,29 +151,75 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
     }
 
 
-    private final String[] createStatements = { //edit to my table needs
+    private final String[] createAuthStatements = { //edit to auth table
             """
-            CREATE TABLE IF NOT EXISTS  pet (
-              `id` int NOT NULL AUTO_INCREMENT,
-              `name` varchar(256) NOT NULL,
-              `type` ENUM('CAT', 'DOG', 'FISH', 'FROG', 'ROCK') DEFAULT 'CAT',
+            CREATE TABLE IF NOT EXISTS  authtoken (
+              `authtoken` varchar(256) NOT NULL,
+              `username` varchar(256) NOT NULL,
               `json` TEXT DEFAULT NULL,
-              PRIMARY KEY (`id`),
-              INDEX(type),
-              INDEX(name)
+              PRIMARY KEY (`authtoken`),
+              INDEX(username),
+              INDEX(authtoken)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
 
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
+    private final String[] createUserStatements = { //edit to user table
+            //password will be hashed idk if varchar(256) will work for that
+            """
+            CREATE TABLE IF NOT EXISTS  user (
+              `username` varchar(256) NOT NULL,
+              `password` varchar(256) NOT NULL,
+              `email` varchar(256) NOT NULL,
+              `json` TEXT DEFAULT NULL,
+              PRIMARY KEY (`username`),
+              INDEX(username),
+              INDEX(password),
+              INDEX(email)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+    };
+
+    private final String[] createGameStatements = { //edit to user table
+            //password will be hashed idk if varchar(256) will work for that
+            """
+            CREATE TABLE IF NOT EXISTS  user (
+              `id` int NOT NULL AUTO_INCREMENT,
+              `whiteusername` varchar(256),
+              `blackusername` varchar(256),
+              `gamename` varchar(256) NOT NULL,
+              `game` varchar(256) NOT NULL,
+              `email` varchar(256) NOT NULL,
+              `json` TEXT DEFAULT NULL,
+              PRIMARY KEY (`id`),
+              INDEX(whiteusername),
+              INDEX(blackusername),
+              INDEX(gamename),
+              INDEX(game)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+    };
+
+    private void configureTable(String[] statements) throws DataAccessException{
         try (Connection conn = DatabaseManager.getConnection()) {
-            for (String statement : createStatements) {
+            for (String statement : statements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
             }
         } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
+    }
+
+
+    private void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try{
+            configureTable(createGameStatements);
+            configureTable(createAuthStatements);
+            configureTable(createUserStatements);
+        } catch (DataAccessException ex) {
             throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
     }
