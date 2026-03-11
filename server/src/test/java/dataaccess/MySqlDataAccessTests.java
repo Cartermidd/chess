@@ -77,7 +77,20 @@ public class MySqlDataAccessTests {
     }
 
 
-
+    @Test
+    @DisplayName("delete auth token from table")
+    public void deleteAuth(){
+        var auth = new AuthData("random username","abcd");
+        try{
+            dataAccess.create(auth);
+            AuthData data = dataAccess.findByAuth("abcd");
+            Assertions.assertTrue(data.userName().equals("random username"));
+            dataAccess.deleteAuth("abcd");
+            AuthData newData = dataAccess.findByAuth("abcd");
+            Assertions.assertNull(newData);
+        }catch (Exception e){
+            throw new RuntimeException(e);}
+    }
 
 
 
