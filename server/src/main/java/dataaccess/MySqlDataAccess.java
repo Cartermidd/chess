@@ -27,17 +27,17 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
 
     @Override
     public void create(AuthData authData) throws DataAccessException {
-        var statement = "INSERT INTO authtokens (username, authToken) VALUES (?, ?)";
-        String json = new Gson().toJson(authData);
-        int id = updateAuthTokens(statement, authData.userName(), authData.authToken(), json);
+        if(authData.authToken() == null | authData.userName() == null){throw new DataAccessException("Database shouldn't accept NULL as an AuthToken or Username");}
+        var statement = "INSERT INTO authtokens (username, authtoken) VALUES (?, ?)";
+        int id = updateAuthTokens(statement, authData.userName(), authData.authToken());
     }
 
     @Override
     public AuthData findByAuth(String authToken) throws DataAccessException {
         try (Connection con = DatabaseManager.getConnection()) {
-            var statement = "SELECT username, authtoken FROM auth WHERE authtoken=?";
+            var statement = "SELECT authtoken, username FROM authtokens WHERE authtoken=?";
             try (PreparedStatement ps = con.prepareStatement(statement)) {
-                ps.setString(2, authToken);
+                ps.setString(1, authToken);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return readAuth(rs);
@@ -54,7 +54,8 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-
+        var statement = "DELETE FROM authtokens WHERE authtoken=?";
+        updateAuthTokens(statement, authToken);
     }
 
     @Override
@@ -85,7 +86,7 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
         try {
             var statement = "TRUNCATE users";
             updateUsers(statement);
-            statement = "TRUNCATE auth";
+            statement = "TRUNCATE authtokens";
             updateAuthTokens(statement);
             statement = "TRUNCATE games";
             updateGames(statement);
@@ -136,7 +137,7 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
-                    ps.setString(i + 1, param.toString());
+                    ps.setString(i+1, param.toString());
                 }
                 ps.executeUpdate();
 
