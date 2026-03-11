@@ -70,11 +70,14 @@ public class Server {
 
     public int run(int desiredPort) {
         javalin.start(desiredPort);
-        return javalin.port();
+        return this.port();
     }
 
     public void stop(){
         javalin.stop();
     }
 
+    public int port() {
+        return javalin.port();
+    }
 }

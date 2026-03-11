@@ -17,6 +17,10 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
     private Integer gameId = 1;
 
 
+    //if (not database){database = DatabaseManager.createdatabase
+    //if not column creat column
+
+
     @Override
     public void create(UserData user) throws DataAccessException{
         try {
