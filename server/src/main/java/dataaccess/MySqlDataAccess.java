@@ -79,7 +79,7 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
 
     }
 
-// lets make an update function for each data base type!
+// let's make an update function for each database type!
     private int updateAuthtokens(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
