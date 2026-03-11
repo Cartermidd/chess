@@ -1,8 +1,8 @@
 package server;
 
 import com.google.gson.*;
+import dataaccess.*;
 import io.javalin.*;
-import dataaccess.MemoryDataAccess;
 import server.handlers.*;
 import service.*;
 
@@ -21,11 +21,14 @@ public class Server {
 
 
     public Server() {
-        MemoryDataAccess dao = new MemoryDataAccess();
+//        MemoryDataAccess dao = new MemoryDataAccess(); Use this line of code to run a server on local memory (not through mySQL)
+        UserDAO userDAO = new MySqlDataAccess();
+        GameDAO gameDAO = new MySqlDataAccess();
+        AuthDAO authDAO = new MySqlDataAccess();
 
-        this.userService = new UserService(dao, dao);
-        this.gameService = new GameService(dao, dao);
-        this.clearService = new ClearService(dao, dao, dao);
+        this.userService = new UserService(userDAO, authDAO);
+        this.gameService = new GameService(authDAO, gameDAO);
+        this.clearService = new ClearService(userDAO, gameDAO, authDAO);
         this.registerHandler = new RegisterHandler(userService);
         this.loginHandler = new LoginHandler(userService);
         this.logoutHandler = new LogoutHandler(userService);

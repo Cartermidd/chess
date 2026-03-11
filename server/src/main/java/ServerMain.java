@@ -13,15 +13,19 @@ public class ServerMain {
                 port = Integer.parseInt(args[0]);
             }
 
+            UserDAO userDAO = new MySqlDataAccess();
+            GameDAO gameDAO = new MySqlDataAccess();
+            AuthDAO authDAO = new MySqlDataAccess();
 
-            UserDAO userDAO = new MemoryDataAccess();
-            GameDAO gameDAO = new MemoryDataAccess();
-            AuthDAO authDAO = new MemoryDataAccess();
-            if (args.length >= 2 && args[1].equals("sql")){
-                userDAO = new MySqlDataAccess();
-                gameDAO = new MySqlDataAccess();
-                authDAO = new MySqlDataAccess();
-            }
+//            UserDAO userDAO = new MemoryDataAccess();
+//            GameDAO gameDAO = new MemoryDataAccess();
+//            AuthDAO authDAO = new MemoryDataAccess();
+//            if (args.length >= 2 && args[1].equals("sql")){
+//                userDAO = new MySqlDataAccess();
+//                gameDAO = new MySqlDataAccess();
+//                authDAO = new MySqlDataAccess();
+//            }
+
 
             var clearService = new ClearService(userDAO, gameDAO, authDAO);
             var gameService = new GameService(authDAO, gameDAO);
