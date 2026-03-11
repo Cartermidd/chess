@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
 import models.AuthData;
 import models.GameData;
 import models.UserData;
@@ -8,7 +9,12 @@ import results.CreateGameResult;
 import results.ListGamesResult;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+import static java.sql.Types.NULL;
 
 public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
 
@@ -17,10 +23,11 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
     }
 
 
-
     @Override
     public void create(AuthData authData) throws DataAccessException {
-
+        var statement = "INSERT INTO authtokens (userName, authToken) VALUES (?, ?)";
+        String json = new Gson().toJson(authData);
+        int id = updateAuthtokens(statement, authData.userName(), authData.authToken(), json);
     }
 
     @Override
@@ -34,17 +41,19 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
     }
 
     @Override
-    public CreateGameResult createGame(String name) throws DataAccessException {
+    public CreateGameResult createGame(String name) throws DataAccessException {//I need to serialize game
+        var statement = "INSERT INTO authtokens (userName, authToken) VALUES (?, ?)";
+        String json = new Gson().toJson(authData);
+        int id = updateAuthtokens(statement, authData.userName(), authData.authToken(), json);
+    }
+
+    @Override
+    public ListGamesResult listGames() throws DataAccessException {//I need to deserialize games
         return null;
     }
 
     @Override
-    public ListGamesResult listGames() throws DataAccessException {
-        return null;
-    }
-
-    @Override
-    public GameData findByID(Integer id) throws DataAccessException {
+    public GameData findByID(Integer id) throws DataAccessException {//I need to deserialize game
         return null;
     }
 
@@ -54,12 +63,14 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
     }
 
     @Override
-    public void create(UserData user) throws DataAccessException {
-
+    public void create(UserData user) throws DataAccessException {//I need to hash the password
+        var statement = "INSERT INTO users (userName, password, email) VALUES (?, ?, ?)";
+        String json = new Gson().toJson(authData);
+        int id = updateAuthtokens(statement, authData.userName(), authData.authToken(), json);
     }
 
     @Override
-    public UserData findByUsername(String username) throws DataAccessException {
+    public UserData findByUsername(String username) throws DataAccessException {//I need to unhash the password
         return null;
     }
 
@@ -68,6 +79,78 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
 
     }
 
+// lets make an update function for each data base type!
+    private int updateAuthtokens(String statement, Object... params) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                for (int i = 0; i < params.length; i++) {
+                    Object param = params[i];
+                    if (param instanceof String p) ps.setString(i + 1, p);
+                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
+                    else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
+                    else if (param == null) ps.setNull(i + 1, NULL);
+                }
+                ps.executeUpdate();
+
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+
+                return 0;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
+    }
+
+    private int updateUsers(String statement, Object... params) throws ResponseException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                for (int i = 0; i < params.length; i++) {
+                    Object param = params[i];
+                    if (param instanceof String p) ps.setString(i + 1, p);
+                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
+                    else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
+                    else if (param == null) ps.setNull(i + 1, NULL);
+                }
+                ps.executeUpdate();
+
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+
+                return 0;
+            }
+        } catch (SQLException e) {
+            throw new ResponseException(ResponseException.Code.ServerError, String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
+    }
+
+    private int updateGames(String statement, Object... params) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                for (int i = 0; i < params.length; i++) {
+                    Object param = params[i];
+                    if (param instanceof String p) ps.setString(i + 1, p);
+                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
+                    else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
+                    else if (param == null) ps.setNull(i + 1, NULL);
+                }
+                ps.executeUpdate();
+
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+
+                return 0;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
+    }
 
 
     private final String[] createStatements = { //edit to my table needs
