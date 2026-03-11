@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import models.AuthData;
 import models.GameData;
 import models.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import results.CreateGameResult;
 import results.ListGamesResult;
 
@@ -24,7 +25,7 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
         } catch (Exception e){ throw new RuntimeException("SQL Database configuration error");}
     }
 
-
+    //AuthData functions
     @Override
     public void create(AuthData authData) throws DataAccessException {
         if(authData.authToken() == null | authData.userName() == null){throw new DataAccessException("Database shouldn't accept NULL as an AuthToken or Username");}
@@ -58,6 +59,43 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
         var statement = "DELETE FROM authtokens WHERE authtoken=?";
         updateAuthTokens(statement, authToken);
     }
+
+    //User functions
+    @Override
+    public void create(UserData user) throws DataAccessException {//I need to hash the password
+        if(user.password() == null | user.userName() == null){throw new DataAccessException("Database shouldn't accept NULL as an AuthToken or Username");}
+        String password = hashPassword(user.password());
+        var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+        updateUsers(statement, user.userName(), password, user.email());
+    }
+
+    @Override
+    public UserData findByUsername(String username) throws DataAccessException {//I need to unhash the password
+        try (Connection con = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, password, email FROM users WHERE username=?";
+            try (PreparedStatement ps = con.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readUser(rs);
+                    }
+                }
+
+            }
+
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return null;
+    }
+
+
+    private String hashPassword(String password){
+        return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
+
+
 
     @Override
     public CreateGameResult createGame(String name) throws DataAccessException {//I need to serialize game
@@ -96,34 +134,7 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
         }
     }
 
-    @Override
-    public void create(UserData user) throws DataAccessException {//I need to hash the password
-
-        var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
-//        String json = new Gson().toJson(authData);
-//        int id = updateAuthTokens(statement, authData.userName(), authData.authToken(), json);
-    }
-
-    @Override
-    public UserData findByUsername(String username) throws DataAccessException {//I need to unhash the password
-        try (Connection con = DatabaseManager.getConnection()) {
-            var statement = "SELECT username, password, email FROM users WHERE username=?";
-            try (PreparedStatement ps = con.prepareStatement(statement)) {
-                ps.setString(1, username);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return readUser(rs);
-                    }
-                }
-
-            }
-
-        } catch (Exception e) {
-            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
-        }
-        return null;
-    }
-
+//auth helper functions
 
     private AuthData readAuth(ResultSet rs) throws SQLException {
         var authToken = rs.getString("authtoken");
@@ -154,6 +165,7 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
         }
     }
 
+    //user helper functions
     private UserData readUser(ResultSet rs) throws SQLException {
         var userName = rs.getString("username");
         var password = rs.getString("password");
@@ -186,6 +198,8 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
         }
     }
 
+
+    //game helper functions
     private int updateGames(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
@@ -210,6 +224,8 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
         }
     }
 
+
+    //creation statements
 
     private final String[] createAuthStatements = { //edit to auth table
             """

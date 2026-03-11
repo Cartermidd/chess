@@ -1,6 +1,7 @@
 package dataaccess;
 
 import models.AuthData;
+import models.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
 
@@ -33,6 +34,7 @@ public class MySqlDataAccessTests {
         }
     }
 
+    // AUTHTOKEN TESTS
 
     @Test
     @DisplayName("Add AuthToken object to Auth database")
@@ -100,6 +102,47 @@ public class MySqlDataAccessTests {
         }, "Database should throw error when you try to delete a non-existent AuthToken");
     }
 
+    //USER TESTS
+
+    @Test
+    @DisplayName("Register User")
+    public void registerUser(){
+        var user = new UserData("random username","abcd", "this is not an email");
+        assertDoesNotThrow(() -> dataAccess.create(user));
+    }
+
+    @Test
+    @DisplayName("Fail to register user")
+    public void registerFail(){
+        assertThrows(DataAccessException.class, ()->{
+            String token = null;
+            var user = new UserData("user",token,"email");
+            dataAccess.create(user);
+        }, "Database shouldn't accept NULL as a password");
+    }
+
+    @Test
+    @DisplayName("find saved user object")
+    public void findUser(){
+        var user = new UserData("user","password","email");
+        try{
+            dataAccess.create(user);
+            UserData data = dataAccess.findByUsername("user");
+            Assertions.assertTrue(data.email().equals("email"));
+        }catch (Exception e){
+            throw new RuntimeException(e);}
+    }
+
+
+    @Test
+    @DisplayName("search for user not in table")
+    public void invalidUserSearch(){
+        try{
+            UserData data = dataAccess.findByUsername("abcd");
+            Assertions.assertNull(data);
+        }catch (Exception e){
+            throw new RuntimeException(e);}
+    }
 
 
 
