@@ -239,6 +239,7 @@ public class MySqlDataAccessTests {
             throw new RuntimeException(e);}
     }
 
+    //clear
     @Test
     @DisplayName("Clear test")
     public void clearTest(){
