@@ -25,13 +25,13 @@ public class ListGamesHandler {
             ctx.result(new Gson().toJson(result));
             ctx.contentType("application/json");
         } catch (DataAccessException e){
-            ctx.status(400);
-            ctx.result("Data Access Error");
+            ctx.status(500);
+            ctx.result(new Gson().toJson(new ErrorResponse("Data Access Error" + e)));
             ctx.contentType("application/json");
         }catch (UnauthorizedException e){
             ctx.status(401);
+            ctx.result(new Gson().toJson(new ErrorResponse("Error: Unauthorized")));
             ctx.contentType("application/json");
-            ctx.result(new Gson().toJson(Map.of("message","Error: unauthorized")));
         }
     }
 

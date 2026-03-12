@@ -23,8 +23,8 @@ public class LogoutHandler {
             ctx.result(new Gson().toJson(new GenericSuccessfulResult()));
             ctx.contentType("application/json");
         } catch(DataAccessException e) {
-            ctx.status(400);
-            ctx.result(new Gson().toJson(new ErrorResponse(e.toString())));
+            ctx.status(500);
+            ctx.result(new Gson().toJson(new ErrorResponse("Error" + e)));
             ctx.contentType("application/json");
         } catch (UnauthorizedException e){
             ctx.status(401);

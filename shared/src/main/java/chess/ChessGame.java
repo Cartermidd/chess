@@ -171,14 +171,14 @@ public class ChessGame {
     }
 
 
-    private static final Gson gSon = new Gson();
+    private static final Gson GSON = new Gson();
 
     public static String serialize(ChessGame game) {
-        return gSon.toJson(game);
+        return GSON.toJson(game);
     }
 
     public static ChessGame deserialize(String serial) {
-        return gSon.fromJson(serial, ChessGame.class);
+        return GSON.fromJson(serial, ChessGame.class);
     }
 
     @Override
