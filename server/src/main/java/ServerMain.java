@@ -17,14 +17,6 @@ public class ServerMain {
             GameDAO gameDAO = new MySqlDataAccess();
             AuthDAO authDAO = new MySqlDataAccess();
 
-//            UserDAO userDAO = new MemoryDataAccess();
-//            GameDAO gameDAO = new MemoryDataAccess();
-//            AuthDAO authDAO = new MemoryDataAccess();
-//            if (args.length >= 2 && args[1].equals("sql")){
-//                userDAO = new MySqlDataAccess();
-//                gameDAO = new MySqlDataAccess();
-//                authDAO = new MySqlDataAccess();
-//            }
 
 
             var clearService = new ClearService(userDAO, gameDAO, authDAO);

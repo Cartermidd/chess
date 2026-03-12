@@ -243,10 +243,6 @@ public class MySqlDataAccessTests {
     @Test
     @DisplayName("Clear test")
     public void clearTest(){
-        try {
-            dataAccess.clear();
-        } catch (Exception ex){
-            throw new RuntimeException(ex.toString());
-        }
+        clearAll();
     }
 }

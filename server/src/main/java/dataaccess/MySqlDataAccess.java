@@ -30,7 +30,8 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
     //AuthData functions
     @Override
     public void create(AuthData authData) throws DataAccessException {
-        if(authData.authToken() == null | authData.userName() == null){throw new DataAccessException("Database shouldn't accept NULL as an AuthToken or Username");}
+        if(authData.authToken() == null | authData.userName() == null){
+            throw new DataAccessException("Database shouldn't accept NULL as an AuthToken or Username");}
         var statement = "INSERT INTO authtokens (username, authtoken) VALUES (?, ?)";
         int id = updateAuthTokens(statement, authData.userName(), authData.authToken());
     }
@@ -65,10 +66,11 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
     //User functions
     @Override
     public void create(UserData user) throws DataAccessException {//I need to hash the password
-        if(user.password() == null | user.userName() == null){throw new DataAccessException("Database shouldn't accept NULL as an AuthToken or Username");}
+        if(user.password() == null | user.userName() == null){
+            throw new DataAccessException("Database shouldn't accept NULL as an AuthToken or Username");}
         String password = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
-        updateUsers(statement, user.userName(), password, user.email());
+        updateUsersGames(statement, user.userName(), password, user.email());
     }
 
     @Override
@@ -98,7 +100,7 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
         ChessGame game = new ChessGame();
         String serializedGame = ChessGame.serialize(game);
         var statement = "INSERT INTO games (gamename, game, whiteusername, blackusername) VALUES (?, ?, NULL, NULL)";
-        int id = updateGames(statement, name, serializedGame);
+        int id = updateUsersGames(statement, name, serializedGame);
         return new CreateGameResult(id);
     }
 
@@ -125,11 +127,11 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
         if (username == null){throw new DataAccessException("can't name user null");}
         if (color == ChessGame.TeamColor.BLACK){
             var statement = "UPDATE games SET blackusername = ? WHERE id=?";
-            int newId = updateGames(statement, username, id);
+            int newId = updateUsersGames(statement, username, id);
         }
         if (color == ChessGame.TeamColor.WHITE){
             var statement = "UPDATE games SET whiteusername = ? WHERE id=?";
-            int newId = updateGames(statement, username, id);
+            int newId = updateUsersGames(statement, username, id);
         }
     }
 
@@ -157,11 +159,11 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
     public void clear() throws DataAccessException {
         try {
             var statement = "TRUNCATE users";
-            updateUsers(statement);
+            updateUsersGames(statement);
             statement = "TRUNCATE authtokens";
             updateAuthTokens(statement);
             statement = "TRUNCATE games";
-            updateGames(statement);
+            updateUsersGames(statement);
         } catch (Exception e) {
             throw new DataAccessException(e + " Data Access Error");
         }
@@ -207,15 +209,14 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
     }
 
 
-    private int updateUsers(String statement, Object... params) throws DataAccessException {
+    private int updateUsersGames(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
-//                    else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
-                    else if (param == null) ps.setNull(i + 1, NULL);
+                    if (param instanceof String p) {ps.setString(i + 1, p);}
+                    else if (param instanceof Integer p) {ps.setInt(i + 1, p);}
+                    else if (param == null) {ps.setNull(i + 1, NULL);}
                 }
                 ps.executeUpdate();
 
@@ -240,30 +241,6 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
         var gameString = rs.getString("game");
         ChessGame game = ChessGame.deserialize(gameString);
         return new GameData(id, whiteusername, blackusername, gamename, game);
-    }
-
-    private int updateGames(String statement, Object... params) throws DataAccessException {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (int i = 0; i < params.length; i++) {
-                    Object param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
-//                    else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
-                    else if (param == null) ps.setNull(i + 1, NULL);
-                }
-                ps.executeUpdate();
-
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-
-                return 0;
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
-        }
     }
 
 
