@@ -1,5 +1,7 @@
 package chess;
 
+import com.google.gson.Gson;
+
 import java.util.Collection;
 import java.util.Objects;
 
@@ -21,7 +23,7 @@ public class ChessGame {
         board.resetBoard();
     }
 
-    public ChessGame(ChessGame original){
+    public ChessGame(ChessGame original) {
         this.board = original.board;
         this.turnHaver = original.turnHaver;
     }
@@ -59,7 +61,7 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = getBoard().getPiece(startPosition);
-        if (piece == null){
+        if (piece == null) {
             return null;
         } else {
             Collection<ChessMove> initialList = piece.pieceMoves(getBoard(), startPosition);
@@ -81,7 +83,7 @@ public class ChessGame {
             throw new InvalidMoveException("Invalid Move");
         } else if (!validMoves.contains(move)) {
             throw new InvalidMoveException("Invalid Move");
-        } else if(getTeamTurn() != piece.getTeamColor()){
+        } else if (getTeamTurn() != piece.getTeamColor()) {
             throw new InvalidMoveException("Wrong turn");
         } else {
             setBoard(ValidMover.moveMaker(board, move, turnHaver, piece));
@@ -110,8 +112,14 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) { //broken
-        if (!isInCheck(teamColor)){return false;}
-        if (GameOverChecker.inCheckmate(getBoard(), teamColor)){return true;} else {return false;}
+        if (!isInCheck(teamColor)) {
+            return false;
+        }
+        if (GameOverChecker.inCheckmate(getBoard(), teamColor)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -122,9 +130,17 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if (isInCheck(teamColor)){return false;}
+        if (isInCheck(teamColor)) {
+            return false;
+        }
         ChessBoard safeboard = new ChessBoard(getBoard());
-        if (GameOverChecker.inStalemate(getBoard(), teamColor)){setBoard(safeboard); return true;} else {setBoard(safeboard); return false;}
+        if (GameOverChecker.inStalemate(getBoard(), teamColor)) {
+            setBoard(safeboard);
+            return true;
+        } else {
+            setBoard(safeboard);
+            return false;
+        }
     }
 
     /**
@@ -132,7 +148,9 @@ public class ChessGame {
      *
      * @param board the New Board to use
      */
-    public void setBoard(ChessBoard board) {this.board = board;}
+    public void setBoard(ChessBoard board) {
+        this.board = board;
+    }
 
     /**
      * Gets the current chessboard
@@ -152,6 +170,17 @@ public class ChessGame {
         return chessGame.board.equals(board) && turnHaver == chessGame.turnHaver;
     }
 
+
+    private static final Gson gson = new Gson();
+
+    public static String serialize(ChessGame game) {
+        return gson.toJson(game);
+    }
+
+    public static ChessGame deserialize(String serial) {
+        return gson.fromJson(serial, ChessGame.class);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(getBoard(), turnHaver);
@@ -164,4 +193,5 @@ public class ChessGame {
                 ", turnHaver=" + turnHaver +
                 '}';
     }
+
 }

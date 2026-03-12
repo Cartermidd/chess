@@ -3,6 +3,7 @@ package service;
 import dataaccess.*;
 import exceptions.*;
 import models.*;
+import org.mindrot.jbcrypt.BCrypt;
 import requests.*;
 import results.*;
 
@@ -46,7 +47,7 @@ public class UserService {
         if (user == null){
             throw new UserDoesNotExistException("Error: No User with that username");
         }
-        if(Objects.equals(user.getPassword(), request.getPassword())){
+        if(verifyPassword(user.getPassword(), request.getPassword())){//encrypted password == login password
             String authToken = GenerateAuthToken.generateAuthToken();
             authDAO.create(new AuthData(user.getUsername(),authToken));
             return new LoginResult(user.getUsername(),authToken);
@@ -68,4 +69,8 @@ public class UserService {
         }
     }
 
+
+    public static Boolean verifyPassword(String hashedPassword, String loginPassword){
+        return BCrypt.checkpw(loginPassword,hashedPassword);
+    }
 }

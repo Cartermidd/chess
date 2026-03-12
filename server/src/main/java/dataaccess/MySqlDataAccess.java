@@ -13,6 +13,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
@@ -64,7 +66,7 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
     @Override
     public void create(UserData user) throws DataAccessException {//I need to hash the password
         if(user.password() == null | user.userName() == null){throw new DataAccessException("Database shouldn't accept NULL as an AuthToken or Username");}
-        String password = hashPassword(user.password());
+        String password = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
         updateUsers(statement, user.userName(), password, user.email());
     }
@@ -89,35 +91,66 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
         return null;
     }
 
-
-    private String hashPassword(String password){
-        return BCrypt.hashpw(password, BCrypt.gensalt());
-    }
-
-
-
-
+    //Game functions
     @Override
     public CreateGameResult createGame(String name) throws DataAccessException {//I need to serialize game
-        var statement = "INSERT INTO authtokens (username, authToken) VALUES (?, ?)";
-//        String json = new Gson().toJson(authData);
-//        int id = updateAuthtokens(statement, authData.userName(), authData.authToken(), json);
-        return new CreateGameResult(1);
-    }
-
-    @Override
-    public ListGamesResult listGames() throws DataAccessException {//I need to deserialize games
-        return null;
+        if (name == null){throw new DataAccessException("Can't pass null as name for string");}
+        ChessGame game = new ChessGame();
+        String serializedGame = ChessGame.serialize(game);
+        var statement = "INSERT INTO games (gamename, game, whiteusername, blackusername) VALUES (?, ?, NULL, NULL)";
+        int id = updateGames(statement, name, serializedGame);
+        return new CreateGameResult(id);
     }
 
     @Override
     public GameData findByID(Integer id) throws DataAccessException {//I need to deserialize game
+        try (Connection con = DatabaseManager.getConnection()) {
+            var statement = "SELECT id, gamename, game, whiteusername, blackusername FROM games WHERE id=?";
+            try (PreparedStatement ps = con.prepareStatement(statement)) {
+                ps.setInt(1, id);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readGame(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
         return null;
     }
 
     @Override
     public void updateGame(Integer id, ChessGame.TeamColor color, String username) throws DataAccessException {
+        if (username == null){throw new DataAccessException("can't name user null");}
+        if (color == ChessGame.TeamColor.BLACK){
+            var statement = "UPDATE games SET blackusername = ? WHERE id=?";
+            int newId = updateGames(statement, username, id);
+        }
+        if (color == ChessGame.TeamColor.WHITE){
+            var statement = "UPDATE games SET whiteusername = ? WHERE id=?";
+            int newId = updateGames(statement, username, id);
+        }
+    }
 
+
+    @Override
+    public ListGamesResult listGames() throws DataAccessException {//I need to deserialize games
+        String statement = "SELECT * FROM games";
+        ArrayList<GameData> games = new ArrayList<>();
+        try (Connection con = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = con.prepareStatement(statement)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    while(rs.next()){
+                        GameData game = readGame(rs);
+                        games.add(game);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e + " Data Access Error");
+        }
+        return new ListGamesResult(games);
     }
 
     @Override
@@ -198,8 +231,17 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
         }
     }
 
-
     //game helper functions
+    private GameData readGame(ResultSet rs) throws SQLException {
+        var id = rs.getInt("id");
+        var whiteusername = rs.getString("whiteusername");
+        var blackusername = rs.getString("blackusername");
+        var gamename = rs.getString("gamename");
+        var gameString = rs.getString("game");
+        ChessGame game = ChessGame.deserialize(gameString);
+        return new GameData(id, whiteusername, blackusername, gamename, game);
+    }
+
     private int updateGames(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
@@ -262,13 +304,11 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
               `whiteusername` varchar(256),
               `blackusername` varchar(256),
               `gamename` varchar(256) NOT NULL,
-              `game` varchar(256) NOT NULL,
-              `email` varchar(256) NOT NULL,
+              `game` TEXT NOT NULL,
               PRIMARY KEY (`id`),
               INDEX(whiteusername),
               INDEX(blackusername),
-              INDEX(gamename),
-              INDEX(game)
+              INDEX(gamename)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };

@@ -1,11 +1,17 @@
 package dataaccess;
 
+import chess.ChessGame;
 import models.AuthData;
+import models.GameData;
 import models.UserData;
 import org.junit.jupiter.api.*;
+import results.CreateGameResult;
+import results.ListGamesResult;
 import server.Server;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -144,7 +150,102 @@ public class MySqlDataAccessTests {
             throw new RuntimeException(e);}
     }
 
+ //Game tests
+     @Test
+     @DisplayName("Create Game")
+     public void createGame(){
+         assertDoesNotThrow(() -> dataAccess.createGame("this game"));
+     }
 
+    @Test
+    @DisplayName("Fail to register user")
+    public void createGameFail(){
+        assertThrows(DataAccessException.class, ()->{
+            String user = null;
+            dataAccess.createGame(user);
+        }, "Database shouldn't accept NULL as a password");
+    }
 
+    @Test
+    @DisplayName("find saved game object")
+    public void findGame(){
+        try{
+            CreateGameResult game = dataAccess.createGame("user");
+            int id = game.getGameID();
+            GameData data = dataAccess.findByID(id);
+            Assertions.assertTrue(data.gameName().equals("user"));
+        }catch (Exception e){
+            throw new RuntimeException(e);}
+    }
 
+    @Test
+    @DisplayName("search for game not in table")
+    public void invalidGameSearch(){
+        try{
+            GameData data = dataAccess.findByID(30);
+            Assertions.assertNull(data);
+        }catch (Exception e){
+            throw new RuntimeException(e);}
+    }
+
+    @Test
+    @DisplayName("update game test")
+    public void updateBlackUser(){
+        try{
+            CreateGameResult game = dataAccess.createGame("user");
+            int id = game.getGameID();
+            GameData data = dataAccess.findByID(id);
+            Assertions.assertTrue(data.gameName().equals("user"));
+            dataAccess.updateGame(id, ChessGame.TeamColor.BLACK, "blackusername");
+            GameData data2 = dataAccess.findByID(id);
+            Assertions.assertTrue(data2.blackUsername().equals("blackusername"));
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    @DisplayName("update name to null")
+    public void updateGameFail(){
+        assertThrows(DataAccessException.class, ()->{
+            CreateGameResult game = dataAccess.createGame("user");
+            int id = game.getGameID();
+            dataAccess.updateGame(id, ChessGame.TeamColor.BLACK, null);
+        }, "Database shouldn't accept NULL as a username");
+    }
+
+    @Test
+    @DisplayName("list all saved game objects")
+    public void listGames(){
+        try{
+            CreateGameResult game = dataAccess.createGame("user");
+            GameData data = dataAccess.findByID(game.getGameID());
+            ListGamesResult games = dataAccess.listGames();
+            Collection<GameData> gamesList = games.getGames();
+            Assertions.assertTrue(gamesList.contains(data));
+        }catch (Exception e){
+            throw new RuntimeException(e);}
+    }
+
+    @Test
+    @DisplayName("empty list shouldn't contain games")
+    public void invalidListGames(){
+        try{
+            GameData data = new GameData(2, null, null, "string", new ChessGame());
+            ListGamesResult games = dataAccess.listGames();
+            Collection<GameData> gamesList = games.getGames();
+            Assertions.assertFalse(gamesList.contains(data));
+        }catch (Exception e){
+            throw new RuntimeException(e);}
+    }
+
+    @Test
+    @DisplayName("Clear test")
+    public void clearTest(){
+        try {
+            dataAccess.clear();
+        } catch (Exception ex){
+            throw new RuntimeException(ex.toString());
+        }
+    }
 }
