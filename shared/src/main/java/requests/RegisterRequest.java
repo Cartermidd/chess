@@ -11,6 +11,12 @@ public class RegisterRequest {
         this.email = email;
 }
 
+    public RegisterRequest(String[] params) {
+        this.username = (params.length > 0) ? params[0] : null;
+        this.password = (params.length > 1) ? params[1] : null;
+        this.email    = (params.length > 2) ? params[2] : null;
+    }
+
 
     public String getPassword() {
         return password;

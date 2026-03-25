@@ -1,6 +1,6 @@
 package requests;
 
-public class AuthorizedRequest {
+public class AuthorizedRequest extends AuthTokenCarrier {
     String authToken;
 
     public AuthorizedRequest(String authToken){

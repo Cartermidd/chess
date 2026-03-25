@@ -9,6 +9,12 @@ public class LoginRequest {
         this.username = username;
     }
 
+    public LoginRequest(String[] params) {
+        this.username = (params.length > 0) ? params[0] : null;
+        this.password = (params.length > 1) ? params[1] : null;
+    }
+
+
     public String getUsername(){
         return this.username;
     }
