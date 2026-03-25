@@ -6,4 +6,8 @@ public class AuthTokenCarrier {
     public String getAuthToken() {
         return authToken;
     }
+
+    public void setAuthToken(String authToken){
+        this.authToken = authToken;
+    }
 }

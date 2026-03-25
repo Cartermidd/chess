@@ -1,6 +1,8 @@
 package results;
 
-public class CreateGameResult {
+import requests.AuthTokenCarrier;
+
+public class CreateGameResult extends AuthTokenCarrier {
     int gameID;
 
     public CreateGameResult(int gameID) {

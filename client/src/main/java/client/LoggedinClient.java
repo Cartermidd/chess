@@ -6,18 +6,20 @@ import requests.AuthorizedRequest;
 import requests.CreateGameRequest;
 import requests.LoginRequest;
 import results.CreateGameResult;
+import results.GenericSuccessfulResult;
 import results.ListGamesResult;
 import results.LoginResult;
 import server.ServerFacade;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
 public class LoggedinClient {
     ServerFacade server;
     String authToken = null;
-    Map<Integer, GameData> gamesList = null;
+    Map<Integer, GameData> gamesList = new HashMap<>();
 
     public LoggedinClient(ServerFacade server) throws Exception {
         this.server = server;
@@ -31,7 +33,7 @@ public class LoggedinClient {
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        while (!result.equals("quit")&!result.equals("q")){
+        while (!result.equals("quit")&&!result.equals("q")){
             printPrompt();
             String line = scanner.nextLine();
 
@@ -40,7 +42,7 @@ public class LoggedinClient {
                 System.out.print(result);
 
             } catch (Exception ex){
-                throw new RuntimeException(ex);
+                throw new RuntimeException(ex.getMessage());
             }
 
         }
@@ -60,14 +62,14 @@ public class LoggedinClient {
                 default -> help();
             };
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage());
         }
     }
 
     public String join(String[] params) throws Exception {
         //print game
         //'join' <GAME NUMBER> <COLOR: "black" | "white">
-
+        // Open GameplayClient
     }
 
     public String observe(String[] params) throws Exception{
@@ -77,13 +79,14 @@ public class LoggedinClient {
     public String create(String[] params) throws Exception{
         try{
             CreateGameRequest request = new CreateGameRequest(params);
+            request.setAuthToken(authToken);
             if(CreateGameRequest.misformatted(request)){
                 throw new ImproperRequestException("Misformatted Request - Expected: 'create' <GAME NAME>");
             }
-            CreateGameResult result = server.createGame(request);
+            server.createGame(request);
             return "New game created '" + request.getGameName() + "'";
         }catch (Exception ex){
-            throw new RuntimeException("Misformatted Request - Expected: login <username> <password>");
+            throw new RuntimeException(ex.getMessage());
         }
     }
 
@@ -99,15 +102,23 @@ public class LoggedinClient {
                 gamesList.put(i,game);
                 i++;
             }
-
-
+            return gamesList.toString();
         }catch (Exception ex){
-            throw new RuntimeException("Misformatted Request - Expected: login <username> <password>");
+            throw new RuntimeException(ex.getMessage());
         }
     }
 
     public String logout() throws Exception{
-
+        try{
+            AuthorizedRequest request = new AuthorizedRequest(authToken);
+            if(AuthorizedRequest.misformatted(request)){
+                throw new ImproperRequestException("Misformatted Request - Unauthorized");
+            }
+            server.logout(request);
+            return "quit";
+        }catch (Exception ex){
+            throw new RuntimeException(ex.getMessage());
+        }
     }
 
     private String help(){
