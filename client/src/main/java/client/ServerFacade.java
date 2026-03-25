@@ -1,18 +1,20 @@
-package server;
+package client;
 
 import com.google.gson.Gson;
-import requests.*;
 import results.*;
+import requests.*;
 
-import java.net.*;
-import java.net.http.*;
-import java.net.http.HttpRequest.BodyPublisher;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
+    private String authToken = null;
 
     public ServerFacade(String url) {
         serverUrl = url;
@@ -21,42 +23,52 @@ public class ServerFacade {
 
     //                    .post("/user", registerHandler::register)
     public RegisterResult register(RegisterRequest input) throws Exception {
-        var request = buildRequest("POST", "/user", null, input);
+        var request = buildRequest("POST", "/user", authToken, input);
         var response = sendRequest(request);
-        return handleResponse(response, RegisterResult.class);
+        RegisterResult result = handleResponse(response, RegisterResult.class);
+        if (result != null){
+            authToken = result.getAuthToken();
+        }
+        return result;
     }
 
     //                .post("/session", loginHandler::login)
     public LoginResult login(LoginRequest input) throws Exception {
-        var request = buildRequest("POST", "/session", null, input);
+        var request = buildRequest("POST", "/session", authToken, input);
         var response = sendRequest(request);
-        return handleResponse(response, LoginResult.class);
+        LoginResult result = handleResponse(response, LoginResult.class);
+        if (result != null){
+            authToken = result.getAuthToken();
+        }
+        return result;
     }
 
     //                .delete("/session", logoutHandler::logout)
     public GenericSuccessfulResult logout(AuthorizedRequest input) throws Exception {
-        var request = buildRequest("DELETE", "/session", input.getAuthToken(), null);
+        var request = buildRequest("DELETE", "/session", authToken, null);
         var response = sendRequest(request);
-        return handleResponse(response, GenericSuccessfulResult.class);
+        GenericSuccessfulResult result = handleResponse(response, GenericSuccessfulResult.class);
+        authToken = null;
+        return result;
     }
 
     //                .get("/game", listGamesHandler::listGames)
     public ListGamesResult listGames(AuthorizedRequest input) throws Exception {
-        var request = buildRequest("GET", "/game", input.getAuthToken(), null);
+        var request = buildRequest("GET", "/game", authToken, null);
         var response = sendRequest(request);
         return handleResponse(response, ListGamesResult.class);
     }
 
     //                .post("/game", createGameHandler::createGame)
     public CreateGameResult createGame(CreateGameRequest input) throws Exception {
-        var request = buildRequest("POST", "/game", input.getAuthToken(), input);
+        var request = buildRequest("POST", "/game", authToken, input);
         var response = sendRequest(request);
         return handleResponse(response, CreateGameResult.class);
     }
 
     //                .put("/game", joinGameHandler::joinGame)
     public GenericSuccessfulResult joinGame(JoinGameRequest input) throws Exception {
-        var request = buildRequest("PUT", "/game", input.getAuthToken(), input);
+        var request = buildRequest("PUT", "/game", authToken, input);
         var response = sendRequest(request);
         return handleResponse(response, GenericSuccessfulResult.class);
     }

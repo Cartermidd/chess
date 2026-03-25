@@ -1,14 +1,11 @@
 package client;
 
-import exceptions.ImproperRequestException;
-import results.LoginResult;
-import results.RegisterResult;
-import server.ServerFacade;
 
 import java.util.Arrays;
 import java.util.Scanner;
 import requests.*;
-
+import results.*;
+import results.LoginResult;
 
 public class PreloginClient {
     private final ServerFacade server;
@@ -17,7 +14,6 @@ public class PreloginClient {
         server = new ServerFacade(serverUrl);
 
     }
-
 
     public void run(){
         System.out.println("♕ Welcome to Chess! ♕");
@@ -60,10 +56,7 @@ public class PreloginClient {
     private String login(String[] params) throws Exception {
         try{
             LoginRequest request = new LoginRequest(params);
-            if(LoginRequest.misformatted(request)){
-                throw new ImproperRequestException("Misformatted Request - Expected: login <username> <password>");
-            }
-            LoginResult result = server.login(request);
+            var result = server.login(request);
             LoggedinClient logged = new LoggedinClient(server);
             logged.run(result.getAuthToken(), result.getUsername());
             return "";
@@ -75,9 +68,6 @@ public class PreloginClient {
     private String register(String[] params) throws Exception {
         try{
             RegisterRequest request = new RegisterRequest(params);
-            if(RegisterRequest.misformatted(request)){
-                throw new ImproperRequestException("Misformatted Request - Expected: login <username> <password>");
-            }
             RegisterResult result = server.register(request);
             LoggedinClient logged = new LoggedinClient(server);
             logged.run(result.getAuthToken(), result.getUsername());

@@ -9,7 +9,6 @@ import results.CreateGameResult;
 import results.GenericSuccessfulResult;
 import results.ListGamesResult;
 import results.LoginResult;
-import server.ServerFacade;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -70,10 +69,12 @@ public class LoggedinClient {
         //print game
         //'join' <GAME NUMBER> <COLOR: "black" | "white">
         // Open GameplayClient
+        return "";
     }
 
     public String observe(String[] params) throws Exception{
         //print game
+        return "";
     }
 
     public String create(String[] params) throws Exception{

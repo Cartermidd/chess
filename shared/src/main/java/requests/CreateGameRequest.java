@@ -1,6 +1,6 @@
 package requests;
 
-public class CreateGameRequest extends AuthTokenCarrier {
+public class CreateGameRequest {
     String gameName;
 
     public CreateGameRequest(String gameName) {
@@ -8,7 +8,7 @@ public class CreateGameRequest extends AuthTokenCarrier {
     }
 
     public CreateGameRequest(String[] params) {
-        this.gameName = (params.length > 0) ? params[0] : null;
+        this.gameName = (params.length > 1) ? params[1] : null;
     }
 
 

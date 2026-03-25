@@ -4,7 +4,7 @@ import chess.ChessGame;
 
 import java.util.Objects;
 
-public class JoinGameRequest extends AuthTokenCarrier {
+public class JoinGameRequest {
     ChessGame.TeamColor playerColor;
     Integer gameID;
 
