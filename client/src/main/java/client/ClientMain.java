@@ -19,13 +19,6 @@ public class ClientMain {
             System.out.printf("Unable to start server: %s%n", ex.getMessage());
         }
 
-
-
-
-
-
-
-
     }
 
 }

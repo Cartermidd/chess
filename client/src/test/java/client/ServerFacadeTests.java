@@ -1,27 +1,33 @@
 package client;
 
 import org.junit.jupiter.api.*;
+import requests.AuthorizedRequest;
+import requests.LoginRequest;
+import requests.RegisterRequest;
 import server.Server;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ServerFacadeTests {
 
     private static Server server;
-    static PreloginClient prelogClient;
-    static LoggedinClient loggedClient;
-    static GameplayClient gameClient;
+    static ServerFacade facade;
 
     @BeforeAll
     public static void init() {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
+        facade = new ServerFacade("http://localhost:" + port);
+    }
 
-        var url = "http://localhost:" + server.port();
-        prelogClient = new PreloginClient(url);
+    @BeforeEach
+    void clearDB(){
+        try{
+            facade.clear();
+        }catch (Exception ex){
+            throw new RuntimeException(ex);
+        }
     }
 
     @AfterAll
@@ -29,39 +35,57 @@ public class ServerFacadeTests {
         server.stop();
     }
 
-    @BeforeEach
-    void clear() throws Exception {
-        prelogClient.quit();
+
+
+    @Test
+    void register() throws Exception {
+        var result = facade.register(new RegisterRequest(new String[]{"player1", "password", "p1@email.com"}));
+        assertNotNull(facade.getAuthToken());
+        assertEquals("player1", result.getUsername());
     }
 
     @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
+    void doubleRegister() throws Exception{
+        assertThrows(Exception.class, () -> {
+            facade.register(new RegisterRequest(new String[]{"player1", "password", "p1@email.com"}));
+            facade.register(new RegisterRequest(new String[]{"player1", "password", "p1@email.com"}));
+        });
+    }
+
+
+    @Test
+    void login() throws Exception {
+        var result = facade.register(new RegisterRequest(new String[]{"player1", "password", "p1@email.com"}));
+        facade.logout(new AuthorizedRequest(result.getAuthToken()));
+        var loginResult = facade.login(new LoginRequest(new String[]{"player1", "password"}));
+        assertNotNull(facade.getAuthToken());
+        assertEquals("player1", result.getUsername());
     }
 
     @Test
-    public void runPreloginHelp() {
-        String result = assertDoesNotThrow(() -> prelogClient.help());
-        assertMatches("""
-                Options:
-                Register a new user: 'register' <USERNAME> <PASSWORD> <EMAIL>
-                Login as an existing user: 'login' <USERNAME> <PASSWORD>
-                Exit program: 'quit'
-                To print a list of possible commands: 'help'
-                """,result);
+    void incorrectLogin() throws Exception{
+        assertThrows(Exception.class, () -> {
+            var result = facade.register(new RegisterRequest(new String[]{"player1", "password", "p1@email.com"}));
+            facade.logout(new AuthorizedRequest(result.getAuthToken()));
+            facade.login(new LoginRequest(new String[]{"player1", "badpassword"}));
+        });
+    }
+
+
+    @Test
+    void logout() throws Exception {
+        var result = facade.register(new RegisterRequest(new String[]{"player1", "password", "p1@email.com"}));
+        facade.logout(new AuthorizedRequest(result.getAuthToken()));
+        assertNull(facade.getAuthToken());
     }
 
     @Test
-    public void registerOpensLoggedInClient() {
-        String result = assertDoesNotThrow(() -> prelogClient.help());
-    }
-
-
-
-    private void assertMatches(String expected, String actual) {
-        actual = actual.replace('"', '\'');
-
-        assertTrue(actual.matches(expected), actual + "\n" + expected);
+    void logoutFail() throws Exception{
+        assertThrows(Exception.class, () -> {
+            var result = facade.register(new RegisterRequest(new String[]{"player1", "password", "p1@email.com"}));
+            facade.logout(new AuthorizedRequest(result.getAuthToken()));
+            facade.login(new LoginRequest(new String[]{"player1", "badpassword"}));
+        });
     }
 
 }
