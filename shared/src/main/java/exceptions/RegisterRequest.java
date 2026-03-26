@@ -1,4 +1,4 @@
-package requests;
+package exceptions;
 
 public class RegisterRequest {
     String username;

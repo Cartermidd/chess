@@ -4,15 +4,12 @@ package client;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import com.google.gson.Gson;
-import dataaccess.DataAccessException;
 import exceptions.AlreadyTakenException;
-import exceptions.ImproperRequestException;
 import exceptions.IncorrectPasswordException;
+import exceptions.RegisterRequest;
 import exceptions.UserDoesNotExistException;
 import requests.*;
 import results.*;
-import server.ErrorTranslator;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 import static ui.EscapeSequences.SET_TEXT_COLOR_RED;

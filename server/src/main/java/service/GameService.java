@@ -8,14 +8,11 @@ import exceptions.NoGameException;
 import exceptions.UnauthorizedException;
 import models.AuthData;
 import models.GameData;
-import requests.AuthorizedRequest;
 import requests.CreateGameRequest;
 import requests.JoinGameRequest;
 import results.CreateGameResult;
 import results.GenericSuccessfulResult;
 import results.ListGamesResult;
-
-import java.util.Collection;
 
 public class GameService {
     private final AuthDAO authDAO;

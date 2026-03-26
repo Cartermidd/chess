@@ -1,13 +1,11 @@
 package service;
 
 import dataaccess.*;
-import exceptions.*;
+import exceptions.RegisterRequest;
 import models.*;
 import org.mindrot.jbcrypt.BCrypt;
 import requests.*;
 import results.*;
-
-import java.util.Objects;
 
 public class UserService {
 

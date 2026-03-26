@@ -7,8 +7,6 @@ import exceptions.UnauthorizedException;
 import results.ListGamesResult;
 import service.GameService;
 
-import java.util.Map;
-
 public class ListGamesHandler {
     GameService service;
 

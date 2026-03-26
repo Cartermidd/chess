@@ -5,7 +5,6 @@ import dataaccess.DataAccessException;
 import exceptions.ImproperRequestException;
 import exceptions.UnauthorizedException;
 import requests.CreateGameRequest;
-import requests.RegisterRequest;
 import results.CreateGameResult;
 import service.GameService;
 

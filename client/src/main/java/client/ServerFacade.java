@@ -2,10 +2,11 @@ package client;
 
 import com.google.gson.Gson;
 import exceptions.IncorrectPasswordException;
+import exceptions.RegisterRequest;
 import exceptions.UserDoesNotExistException;
 import results.*;
 import requests.*;
-import server.ErrorTranslator;
+
 
 import java.net.URI;
 import java.net.http.HttpClient;

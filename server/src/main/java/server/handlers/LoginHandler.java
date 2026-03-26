@@ -1,13 +1,11 @@
 package server.handlers;
 
 import exceptions.ImproperRequestException;
-import models.UserData;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import exceptions.IncorrectPasswordException;
 import exceptions.UserDoesNotExistException;
-import org.eclipse.jetty.util.log.Log;
 import requests.LoginRequest;
 import results.LoginResult;
 import service.UserService;

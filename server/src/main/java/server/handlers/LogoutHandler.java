@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import exceptions.UnauthorizedException;
-import requests.AuthorizedRequest;
 import results.GenericSuccessfulResult;
 import service.UserService;
 

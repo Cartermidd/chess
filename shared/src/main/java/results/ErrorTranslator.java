@@ -1,6 +1,4 @@
-package server;
-
-import com.google.gson.Gson;
+package results;
 
 public class ErrorTranslator {
     private String message;
