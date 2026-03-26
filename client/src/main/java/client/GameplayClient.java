@@ -72,8 +72,8 @@ public class GameplayClient {
             return "making moves is not yet implemented";
         }
 
-        public String redraw(ChessBoard board){
-            return printBoard(State.WHITE, board) + printBoard(State.BLACK, board);
+        public String redraw(ChessBoard board) {
+            return (state == State.BLACK) ? printBoardBlack(board) : printBoardWhite(board);
         }
 
         private String printBoard(State view, ChessBoard board){
@@ -85,85 +85,92 @@ public class GameplayClient {
         }
 
         private String printBoardWhite(ChessBoard board){
-            String[] columnLabels = {EMPTY,"a","b","c","d","e","f","g","h",EMPTY};
-            String[] rowLabels = {"1","2","3","4","5","6","7","8"};
+
+
+            String[] columnLabels = {EMPTY," a "," b  "," c ","  d  "," e "," f  "," g "," h ",EMPTY};
+            String[] rowLabels = {" 1 "," 2 "," 3 "," 4 "," 5 "," 6 "," 7 "," 8 "};
 
             StringBuilder printBoard = new StringBuilder();
+
             for (String string : columnLabels){
-                printBoard.append(string);
+                printBoard.append(SET_BG_COLOR_BLUE).append(SET_TEXT_COLOR_BLACK).append(string);
             }
 
-            for (int i = 1; i<9; i++){
-                printBoard.append("\n").append(rowLabels[i-1]);
-                for (int j=1; j<9; j++){
-                    printBoard.append(pieceChecker(board,i,j,ChessGame.TeamColor.WHITE));
+            for (int i = 8; i>0; i--){
+                printBoard.append(RESET_BG_COLOR).append("\n").append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE).append(rowLabels[i-1]);
+                for (int j=8; j>0; j--){
+                    printBoard.append(pieceChecker(board,i,j));
                 }
-                printBoard.append(rowLabels[i-1]);
+                printBoard.append(RESET_BG_COLOR).append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE).append(rowLabels[i-1]).append(RESET_BG_COLOR);
             }
+            printBoard.append("\n");
             for (String string : columnLabels){
-                printBoard.append("\n").append(string);
+                printBoard.append(RESET_BG_COLOR).append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE).append(string).append(RESET_BG_COLOR);
             }
 
             return printBoard.toString();
         }
 
         private String printBoardBlack(ChessBoard board){
-            String[] columnLabels = {EMPTY,"h","g","f","e","d","c","b","a",EMPTY};
-            String[] rowLabels = {"8","7","6","5","4","3","2","1"};
+            String[] columnLabels = {EMPTY," h  "," g ","  f "," e ","  d "," c ","  b "," a ",EMPTY};
+            String[] rowLabels = {" 1 "," 2 "," 3 "," 4 "," 5 "," 6 "," 7 "," 8 "};
 
             StringBuilder printBoard = new StringBuilder();
             for (String string : columnLabels){
-                printBoard.append(string);
+                printBoard.append(SET_BG_COLOR_BLUE).append(SET_TEXT_COLOR_BLACK).append(string);
             }
 
             for (int i = 1; i<9; i++){
-                printBoard.append("\n").append(rowLabels[i-1]);
+                printBoard.append(RESET_BG_COLOR).append("\n").append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE).append(rowLabels[i-1]);
                 for (int j=1; j<9; j++){
-                    printBoard.append(pieceChecker(board,i,j,ChessGame.TeamColor.WHITE));
+                    printBoard.append(pieceChecker(board,i,j));
                 }
-                printBoard.append(rowLabels[i-1]);
-            }
-            printBoard.append("\n");
-            for (String string : columnLabels){
-                printBoard.append(string);
+                printBoard.append(RESET_BG_COLOR).append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE).append(rowLabels[i-1]).append(RESET_BG_COLOR);
             }
 
+            printBoard.append("\n");
+            for (String string : columnLabels){
+                printBoard.append(RESET_BG_COLOR).append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE).append(string).append(RESET_BG_COLOR);
+            }
             return printBoard.toString();
         }
 
-        private String pieceChecker(ChessBoard board, int row, int col, ChessGame.TeamColor color){
+        private String pieceChecker(ChessBoard board, int row, int col){
+            boolean lightSquare = (row+col) % 2 == 0;
+            String bgColor = lightSquare ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY;
             ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+
             if (piece == null){
-                return EMPTY;
-            } else if (piece.getTeamColor() == ChessGame.TeamColor.WHITE && color == ChessGame.TeamColor.WHITE){
+                return bgColor + EMPTY;
+            } else if (piece.getTeamColor() == ChessGame.TeamColor.WHITE){
                 var type = piece.getPieceType();
                 if (type == ChessPiece.PieceType.PAWN){
-                    return WHITE_PAWN;
+                    return bgColor + SET_TEXT_COLOR_WHITE + WHITE_PAWN;
                 } else if(type == ChessPiece.PieceType.KING){
-                    return WHITE_KING;
+                    return bgColor + SET_TEXT_COLOR_WHITE + WHITE_KING;
                 } else if(type == ChessPiece.PieceType.QUEEN){
-                    return WHITE_QUEEN;
+                    return bgColor + SET_TEXT_COLOR_WHITE + WHITE_QUEEN;
                 } else if(type == ChessPiece.PieceType.BISHOP){
-                    return WHITE_BISHOP;
+                    return bgColor + SET_TEXT_COLOR_WHITE + WHITE_BISHOP;
                 } else if(type == ChessPiece.PieceType.KNIGHT){
-                    return WHITE_KNIGHT;
+                    return bgColor + SET_TEXT_COLOR_WHITE + WHITE_KNIGHT;
                 } else {
-                    return WHITE_ROOK;
+                    return bgColor + SET_TEXT_COLOR_WHITE + WHITE_ROOK;
                 }
-            } else if (piece.getTeamColor() == ChessGame.TeamColor.BLACK && color == ChessGame.TeamColor.BLACK) {
+            } else if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
                 var type = piece.getPieceType();
                 if (type == ChessPiece.PieceType.PAWN){
-                    return BLACK_PAWN;
+                    return bgColor + SET_TEXT_COLOR_BLACK + BLACK_PAWN;
                 } else if(type == ChessPiece.PieceType.KING){
-                    return BLACK_KING;
+                    return bgColor + SET_TEXT_COLOR_BLACK + BLACK_KING;
                 } else if(type == ChessPiece.PieceType.QUEEN){
-                    return BLACK_QUEEN;
+                    return bgColor + SET_TEXT_COLOR_BLACK + BLACK_QUEEN;
                 } else if(type == ChessPiece.PieceType.BISHOP){
-                    return BLACK_BISHOP;
+                    return bgColor + SET_TEXT_COLOR_BLACK + BLACK_BISHOP;
                 } else if(type == ChessPiece.PieceType.KNIGHT){
-                    return BLACK_KNIGHT;
+                    return bgColor + SET_TEXT_COLOR_BLACK + BLACK_KNIGHT;
                 } else {
-                    return BLACK_ROOK;
+                    return bgColor + SET_TEXT_COLOR_BLACK + BLACK_ROOK;
                 }
             }
             return "";

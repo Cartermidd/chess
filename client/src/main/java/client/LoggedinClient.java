@@ -19,6 +19,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import static ui.EscapeSequences.RESET_TEXT_COLOR;
+import static ui.EscapeSequences.SET_TEXT_COLOR_RED;
+
 public class LoggedinClient {
     ServerFacade server;
     String authToken = null;
@@ -106,6 +109,7 @@ public class LoggedinClient {
         try {
             GameData data = gamesList.get(params[0]);
             int id = data.gameID();
+            gameplay.run(userName, State.OBSERVER, data);
         } catch (Exception ex){
             return formatError(ex.getMessage());
         }
@@ -180,7 +184,7 @@ public class LoggedinClient {
     }
 
     private String formatError(String error){
-        return error;
+        return SET_TEXT_COLOR_RED + error + RESET_TEXT_COLOR + "\n";
     }
 
 

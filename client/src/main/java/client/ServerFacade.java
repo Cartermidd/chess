@@ -1,8 +1,11 @@
 package client;
 
 import com.google.gson.Gson;
+import exceptions.IncorrectPasswordException;
+import exceptions.UserDoesNotExistException;
 import results.*;
 import requests.*;
+import server.ErrorTranslator;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -33,7 +36,7 @@ public class ServerFacade {
     }
 
     //                .post("/session", loginHandler::login)
-    public LoginResult login(LoginRequest input) throws Exception {
+    public LoginResult login(LoginRequest input) throws IncorrectPasswordException, UserDoesNotExistException, Exception {
         var request = buildRequest("POST", "/session", authToken, input);
         var response = sendRequest(request);
         LoginResult result = handleResponse(response, LoginResult.class);
@@ -109,7 +112,7 @@ public class ServerFacade {
         if (!isSuccessful(status)) {
             var body = response.body();
             if (body != null) {
-                throw new Exception(body.toString());
+                throw new Exception(parseMessage(body));
             }
 
             throw new Exception(String.valueOf(status));
@@ -122,6 +125,9 @@ public class ServerFacade {
         return null;
     }
 
+    private String parseMessage(String json){
+        return new Gson().fromJson(json, ErrorTranslator.class).getMessage();
+    }
 
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
