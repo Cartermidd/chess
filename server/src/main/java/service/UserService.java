@@ -1,7 +1,7 @@
 package service;
 
 import dataaccess.*;
-import exceptions.RegisterRequest;
+import exceptions.*;
 import models.*;
 import org.mindrot.jbcrypt.BCrypt;
 import requests.*;
