@@ -3,14 +3,15 @@ package client;
 
 import java.util.Arrays;
 import java.util.Scanner;
+
+import exceptions.ImproperRequestException;
 import requests.*;
 import results.*;
-import results.LoginResult;
 
 public class PreloginClient {
     private final ServerFacade server;
 
-    public PreloginClient(String serverUrl) throws Exception {
+    public PreloginClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
 
     }
@@ -42,7 +43,9 @@ public class PreloginClient {
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "login", "l" -> login(params);
+                case "login", "l" -> {
+                    yield login(params) + "\n \n" + help();
+                }
                 case "quit", "q" -> quit();
                 case "register", "r" -> register(params);
                 default -> help();
@@ -53,33 +56,39 @@ public class PreloginClient {
 
     }
 
-    private String login(String[] params) throws Exception {
+    public String login(String[] params) throws Exception {
         try{
             LoginRequest request = new LoginRequest(params);
+            if(LoginRequest.misformatted(request)){
+                throw new ImproperRequestException("Misformatted Request - Expected: 'login' <USERNAME> <PASSWORD>");
+            }
             var result = server.login(request);
             LoggedinClient logged = new LoggedinClient(server);
             logged.run(result.getAuthToken(), result.getUsername());
-            return "";
+            return "\nLogging Out";
         }catch (Exception ex){
-            throw new RuntimeException("Misformatted Request - Expected: login <username> <password>");
+            throw new Exception("Misformatted Request - Expected: login <username> <password>");
         }
     }
 
-    private String register(String[] params) throws Exception {
+    public String register(String[] params) throws Exception {
         try{
             RegisterRequest request = new RegisterRequest(params);
+            if(RegisterRequest.misformatted(request)){
+                throw new ImproperRequestException("Misformatted Request - Expected: 'register' <username> <password> <email>");
+            }
             RegisterResult result = server.register(request);
             LoggedinClient logged = new LoggedinClient(server);
             logged.run(result.getAuthToken(), result.getUsername());
             return "";
         }catch (Exception ex){
-            throw new RuntimeException("Misformatted Request - Expected: login <username> <password>");
+            throw new Exception("Misformatted Request - Expected: register <username> <password> <email>");
         }
     }
 
 
 
-    private String help(){
+    public String help(){
         return """
                 Options:
                 Register a new user: 'register' <USERNAME> <PASSWORD> <EMAIL>
@@ -90,14 +99,14 @@ public class PreloginClient {
     }
 
 
-    private static void printPrompt() {
-        System.out.print("\n" + "\u001b[" + "0m" + ">>> " + "\u001b[" + "32m");
+    public static void printPrompt() {
+        System.out.print("\n" + "\u001b[" + "0m" + "Chess Login >>> " + "\u001b[" + "32m");
     }
 
 
-    private static String quit(){
+    public static String quit(){
         System.exit(0);
-        return "Exited";
+        return "quit";
     }
 
 }

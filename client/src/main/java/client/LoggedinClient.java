@@ -1,9 +1,13 @@
 package client;
 
+import chess.ChessGame;
+import exceptions.AlreadyTakenException;
 import exceptions.ImproperRequestException;
+import exceptions.NoGameException;
 import models.GameData;
 import requests.AuthorizedRequest;
 import requests.CreateGameRequest;
+import requests.JoinGameRequest;
 import requests.LoginRequest;
 import results.CreateGameResult;
 import results.GenericSuccessfulResult;
@@ -18,15 +22,17 @@ import java.util.Scanner;
 public class LoggedinClient {
     ServerFacade server;
     String authToken = null;
+    String userName = null;
     Map<Integer, GameData> gamesList = new HashMap<>();
 
-    public LoggedinClient(ServerFacade server) throws Exception {
+    public LoggedinClient(ServerFacade server) {
         this.server = server;
     }
 
 
     public void run(String authToken, String userName){
         this.authToken = authToken;
+        this.userName = userName;
         System.out.printf("Welcome %s!", userName);
         System.out.print(help());
 
@@ -53,7 +59,7 @@ public class LoggedinClient {
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "join", "j" -> join(params);
+                case "play", "p" -> play(params);
                 case "observe", "o" -> observe(params);
                 case "create", "c" -> create(params);
                 case "list", "i" -> list();
@@ -61,33 +67,61 @@ public class LoggedinClient {
                 default -> help();
             };
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            return formatError(e.getMessage());
         }
     }
 
-    public String join(String[] params) throws Exception {
+    public String play(String[] params) throws Exception {
         //print game
         //'join' <GAME NUMBER> <COLOR: "black" | "white">
         // Open GameplayClient
-        return "";
+        JoinGameRequest request = new JoinGameRequest(params);
+        if(JoinGameRequest.misformatted(request)){
+            throw new ImproperRequestException("Misformatted Request - Expected: 'play' <GAME NUMBER> <'black' | 'white'>");
+        }
+        try {
+            GameData data = gamesList.get(request.getGameId());
+            int id = data.gameID();
+            server.joinGame(new JoinGameRequest(request.getPlayerColor(), id));
+
+            GameplayClient gameplay = new GameplayClient(server);
+            if (request.getPlayerColor() == ChessGame.TeamColor.BLACK){
+                gameplay.run(userName, State.BLACK, data);
+            } else if (request.getPlayerColor() == ChessGame.TeamColor.WHITE){
+                gameplay.run(userName, State.WHITE, data);
+            } else {
+                return formatError("Something went wrong in gameplay request");
+            }
+        } catch (AlreadyTakenException ex){
+            return formatError(ex.getMessage());
+        } catch (NoGameException ex){
+            return formatError(ex.getMessage());
+        }
+        return "Exiting Game" + help();
     }
 
     public String observe(String[] params) throws Exception{
-        //print game
+//        Observe game: 'observe' <GAME NUMBER>
+        GameplayClient gameplay = new GameplayClient(server);
+        try {
+            GameData data = gamesList.get(params[0]);
+            int id = data.gameID();
+        } catch (Exception ex){
+            return formatError(ex.getMessage());
+        }
         return "";
     }
 
     public String create(String[] params) throws Exception{
         try{
             CreateGameRequest request = new CreateGameRequest(params);
-            request.setAuthToken(authToken);
             if(CreateGameRequest.misformatted(request)){
                 throw new ImproperRequestException("Misformatted Request - Expected: 'create' <GAME NAME>");
             }
             server.createGame(request);
             return "New game created '" + request.getGameName() + "'";
         }catch (Exception ex){
-            throw new RuntimeException(ex.getMessage());
+            return formatError(ex.getMessage());
         }
     }
 
@@ -103,7 +137,15 @@ public class LoggedinClient {
                 gamesList.put(i,game);
                 i++;
             }
-            return gamesList.toString();
+            String stringList = "Games:";
+            for (Map.Entry<Integer, GameData> entry : gamesList.entrySet()){
+                GameData data = entry.getValue();
+                String white = (data.whiteUsername() != null) ? data.whiteUsername() : "empty";
+                String black = (data.blackUsername() != null) ? data.blackUsername() : "empty";
+                String game = "\n" + entry.getKey().toString() + ". Game name: " + data.gameName() + "      White: " + white + "     Black: " + black;
+                stringList = stringList.concat(game);
+            }
+            return stringList;
         }catch (Exception ex){
             throw new RuntimeException(ex.getMessage());
         }
@@ -124,19 +166,26 @@ public class LoggedinClient {
 
     private String help(){
         return """
+                
                 Options:
-                Join game: 'join' <GAME NUMBER> <COLOR: "black" | "white">
+                Play game: 'play' <GAME NUMBER> <COLOR: "black" | "white">
                 Observe game: 'observe' <GAME NUMBER>
                 Create new game: 'create' <GAME NAME>
                 List all current games: 'list'
                 Logout of current account: 'logout'
                 To print a list of possible commands: 'help'
+                *HINT*
+                Look at the list games before trying to join or observe!
                 """;
+    }
+
+    private String formatError(String error){
+        return error;
     }
 
 
     private static void printPrompt() {
-        System.out.print("\n" + "\u001b[" + "0m" + ">>> " + "\u001b[" + "32m");
+        System.out.print("\n" + "\u001b[" + "0m" + "Chess >>> " + "\u001b[" + "32m");
     }
 
 }

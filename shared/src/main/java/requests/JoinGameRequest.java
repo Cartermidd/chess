@@ -14,8 +14,19 @@ public class JoinGameRequest {
     }
 
     public JoinGameRequest(String[] params) {
-        this.playerColor = (params.length > 0) ? (Objects.equals(params[0], "BLACK") | Objects.equals(params[0], "black")) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE : null;
-        this.gameID = (params.length > 1) ? Integer.valueOf(params[1]) : null;
+
+        if (params.length > 0) {
+            this.gameID = Integer.parseInt(params[0]);
+            if (params.length > 1){
+                if (params[1].equals("BLACK") || params[1].equals("black")) {
+                    this.playerColor = ChessGame.TeamColor.BLACK;
+                } else if (params[1].equals("WHITE") || params[1].equals("white")) {
+                    this.playerColor = ChessGame.TeamColor.WHITE;
+                } else {
+                    this.playerColor = null;
+                }
+            }
+        }
     }
 
 

@@ -8,7 +8,7 @@ public class CreateGameRequest {
     }
 
     public CreateGameRequest(String[] params) {
-        this.gameName = (params.length > 1) ? params[1] : null;
+        this.gameName = (params.length > 0) ? params[0] : null;
     }
 
 

@@ -13,8 +13,8 @@ public class ChessBoard {
 
     ChessPiece[][] squares = new ChessPiece[8][8];
     public ChessBoard() {
-
     }
+
     public ChessBoard(ChessBoard original){
         this.squares = new ChessPiece[8][8];
         for (int i = 0; i<8; i++){
