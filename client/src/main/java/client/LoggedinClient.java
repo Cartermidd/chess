@@ -44,6 +44,7 @@ public class LoggedinClient {
             try {
                 result = eval(line);
                 System.out.print(result);
+                authToken = authToken;
 
             } catch (Exception ex){
                 throw new RuntimeException(ex.getMessage());

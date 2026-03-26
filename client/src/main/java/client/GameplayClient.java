@@ -22,6 +22,23 @@ public class GameplayClient {
             this.server = server;
         }
 
+    public String eval(String input){
+        try {
+            String[] tokens = input.toLowerCase().split(" ");
+            String cmd = (tokens.length > 0) ? tokens[0] : "help";
+            String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            return switch (cmd) {
+                case "highlight", "h" -> highlight(params);
+                case "move", "m" -> move(params);
+                case "redraw", "r" -> redraw(gameData.game().getBoard());
+                case "resign", "s" -> resign();
+                case "leave", "l" -> leave();
+                default -> help();
+            };
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
 
         public void run(String userName, State state, GameData gameData){
             this.state = state;
@@ -29,11 +46,12 @@ public class GameplayClient {
             System.out.print(help());
             System.out.print(printBoard(state, gameData.game().getBoard()));
 
-            Scanner scanner = new Scanner(System.in);
+            Scanner scannr = new Scanner(System.in);
             var result = "";
-            while (!result.equals("quit")&&!result.equals("q")){
+            while (!result.equals("q")&&!result.equals("quit")){
+
                 printPrompt();
-                String line = scanner.nextLine();
+                String line = scannr.nextLine();
 
                 try {
                     result = eval(line);
@@ -46,23 +64,6 @@ public class GameplayClient {
             }
         }
 
-        public String eval(String input){
-            try {
-                String[] tokens = input.toLowerCase().split(" ");
-                String cmd = (tokens.length > 0) ? tokens[0] : "help";
-                String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-                return switch (cmd) {
-                    case "highlight", "h" -> highlight(params);
-                    case "move", "m" -> move(params);
-                    case "redraw", "r" -> redraw(gameData.game().getBoard());
-                    case "resign", "s" -> resign();
-                    case "leave", "l" -> leave();
-                    default -> help();
-                };
-            } catch (Exception e) {
-                throw new RuntimeException(e.getMessage());
-            }
-        }
 
         public String highlight(String[] params){
             return "highlighting not yet implemented";
@@ -101,7 +102,8 @@ public class GameplayClient {
                 for (int j=8; j>0; j--){
                     printBoard.append(pieceChecker(board,i,j));
                 }
-                printBoard.append(RESET_BG_COLOR).append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE).append(rowLabels[i-1]).append(RESET_BG_COLOR);
+                printBoard.append(RESET_BG_COLOR).append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE)
+                        .append(rowLabels[i-1]).append(RESET_BG_COLOR);
             }
             printBoard.append("\n");
             for (String string : columnLabels){
@@ -125,7 +127,8 @@ public class GameplayClient {
                 for (int j=1; j<9; j++){
                     printBoard.append(pieceChecker(board,i,j));
                 }
-                printBoard.append(RESET_BG_COLOR).append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE).append(rowLabels[i-1]).append(RESET_BG_COLOR);
+                printBoard.append(RESET_BG_COLOR).append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE)
+                        .append(rowLabels[i-1]).append(RESET_BG_COLOR);
             }
 
             printBoard.append("\n");
