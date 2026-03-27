@@ -75,47 +75,60 @@ public class LoggedinClient {
         //print game
         //'join' <GAME NUMBER> <COLOR: "black" | "white">
         // Open GameplayClient
-        JoinGameRequest request = new JoinGameRequest(params);
-        if(JoinGameRequest.misformatted(request)){
-            throw new ImproperRequestException("Misformatted Request - Expected: 'play' <GAME NUMBER> <'black' | 'white'>");
-        }
         try {
-            if (gamesList.containsKey(request.getGameId())){
-                GameData data = gamesList.get(request.getGameId());
-                int id = data.gameID();
-                server.joinGame(new JoinGameRequest(request.getPlayerColor(), id));
-
-                GameplayClient gameplay = new GameplayClient(server);
-                if (request.getPlayerColor() == ChessGame.TeamColor.BLACK){
-                    gameplay.run(userName, State.BLACK, data);
-                } else if (request.getPlayerColor() == ChessGame.TeamColor.WHITE){
-                    gameplay.run(userName, State.WHITE, data);
-                } else {
-                    return formatError("Something went wrong in gameplay request");
-                }
-            }else{
-                return formatError("Game does not exist");
+            if (params.length != 2){
+                return formatError("Misformatted Request - Expected: 'play' <GAME NUMBER> <'black' | 'white'>");
             }
-        } catch (AlreadyTakenException ex){
-            return formatError(ex.getMessage());
-        } catch (NoGameException ex){
-            return formatError(ex.getMessage());
+            JoinGameRequest request = new JoinGameRequest(params);
+            if(JoinGameRequest.misformatted(request)){
+                throw new ImproperRequestException("Misformatted Request - Expected: 'play' <GAME NUMBER> <'black' | 'white'>");
+            }
+            try {
+                if (gamesList.containsKey(request.getGameId())){
+                    GameData data = gamesList.get(request.getGameId());
+                    int id = data.gameID();
+                    server.joinGame(new JoinGameRequest(request.getPlayerColor(), id));
+
+                    GameplayClient gameplay = new GameplayClient(server);
+                    if (request.getPlayerColor() == ChessGame.TeamColor.BLACK){
+                        gameplay.run(userName, State.BLACK, data);
+                    } else if (request.getPlayerColor() == ChessGame.TeamColor.WHITE){
+                        gameplay.run(userName, State.WHITE, data);
+                    } else {
+                        return formatError("Something went wrong in gameplay request");
+                    }
+                }else{
+                    return formatError("Game does not exist");
+                }
+            } catch (AlreadyTakenException ex){
+                return formatError(ex.getMessage());
+            } catch (NoGameException ex){
+                return formatError(ex.getMessage());
+            }
+            return "Exiting Game" + help();
+
+        }catch (NumberFormatException _){
+            return formatError("Misformatted Request - Expected: 'play' <GAME NUMBER> <'black' | 'white'> : Game Number must be an Integer!");
         }
-        return "Exiting Game" + help();
+
     }
 
     public String observe(String[] params) throws Exception{
 //        Observe game: 'observe' <GAME NUMBER>
-        if(params.length < 1){
-            throw new ImproperRequestException("Misformatted Request - Expected: 'observe' <GAME NUMBER>");
-        }
-        GameplayClient gameplay = new GameplayClient(server);
         try {
-            if (gamesList.containsKey(Integer.parseInt(params[0]))) {
-                GameData data = gamesList.get(Integer.parseInt(params[0]));
-                gameplay.run(userName, State.OBSERVER, data);
-            } else {
-                return formatError("Game does not exist");
+            if(params.length != 1){
+                throw new ImproperRequestException("Misformatted Request - Expected: 'observe' <GAME NUMBER>");
+            }
+            GameplayClient gameplay = new GameplayClient(server);
+            try{
+                if (gamesList.containsKey(Integer.parseInt(params[0]))) {
+                    GameData data = gamesList.get(Integer.parseInt(params[0]));
+                    gameplay.run(userName, State.OBSERVER, data);
+                } else {
+                    return formatError("Game does not exist");
+                }
+            }catch (NumberFormatException _){
+                return formatError("Misformatted Request - Expected: 'observe' <GAME NUMBER> : Game Number must be an Integer!");
             }
         } catch (Exception ex){
             return formatError(ex.getMessage());
@@ -125,6 +138,9 @@ public class LoggedinClient {
 
     public String create(String[] params) throws Exception{
         try{
+            if (params.length != 1){
+                return formatError("Misformatted Request - Expected: 'create' <GAME NAME>");
+            }
             CreateGameRequest request = new CreateGameRequest(params);
             if(CreateGameRequest.misformatted(request)){
                 throw new ImproperRequestException("Misformatted Request - Expected: 'create' <GAME NAME>");

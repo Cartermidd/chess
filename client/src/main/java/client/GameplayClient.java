@@ -78,10 +78,10 @@ public class GameplayClient {
         }
 
         private String printBoard(State view, ChessBoard board){
-            if (view == State.WHITE){
-                return printBoardWhite(board);
-            } else {
+            if (view == State.BLACK){
                 return printBoardBlack(board);
+            } else {
+                return printBoardWhite(board);
             }
         }
 
@@ -99,7 +99,7 @@ public class GameplayClient {
 
             for (int i = 8; i>0; i--){
                 printBoard.append(RESET_BG_COLOR).append("\n").append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE).append(rowLabels[i-1]);
-                for (int j=8; j>0; j--){
+                for (int j=1; j<9; j++){
                     printBoard.append(pieceChecker(board,i,j));
                 }
                 printBoard.append(RESET_BG_COLOR).append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE)
@@ -124,7 +124,7 @@ public class GameplayClient {
 
             for (int i = 1; i<9; i++){
                 printBoard.append(RESET_BG_COLOR).append("\n").append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE).append(rowLabels[i-1]);
-                for (int j=1; j<9; j++){
+                for (int j=8; j>0; j--){
                     printBoard.append(pieceChecker(board,i,j));
                 }
                 printBoard.append(RESET_BG_COLOR).append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE)
@@ -139,7 +139,7 @@ public class GameplayClient {
         }
 
         private String pieceChecker(ChessBoard board, int row, int col){
-            boolean lightSquare = (row+col) % 2 == 0;
+            boolean lightSquare = (row+col) % 2 != 1;
             String bgColor = lightSquare ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY;
             ChessPiece piece = board.getPiece(new ChessPosition(row, col));
 

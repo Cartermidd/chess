@@ -64,6 +64,9 @@ public class PreloginClient {
 
     public String login(String[] params){
         try {
+            if (params.length != 2) {
+                return formatError("Misformatted Request - Expected: 'login' <USERNAME> <PASSWORD>");
+            }
             LoginRequest request = new LoginRequest(params);
             if (LoginRequest.misformatted(request)) {
                 return formatError("Misformatted Request - Expected: 'login' <USERNAME> <PASSWORD>");
@@ -83,6 +86,9 @@ public class PreloginClient {
 
     public String register(String[] params) throws Exception {
         try{
+            if (params.length != 3){
+                return formatError("Misformatted Request - Expected: 'register' <username> <password> <email>");
+            }
             RegisterRequest request = new RegisterRequest(params);
             if (RegisterRequest.misformatted(request)){
                 return formatError("Misformatted Request - Expected: 'register' <username> <password> <email>");

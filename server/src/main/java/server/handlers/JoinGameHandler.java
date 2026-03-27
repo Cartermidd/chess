@@ -45,7 +45,7 @@ public class JoinGameHandler {
             ctx.contentType("application/json");
         } catch (AlreadyTakenException e){
             ctx.status(403);
-            ctx.result(new Gson().toJson(new ErrorResponse(e.toString())));
+            ctx.result(new Gson().toJson(new ErrorResponse(e.getMessage())));
             ctx.contentType("application/json");
         }
     }

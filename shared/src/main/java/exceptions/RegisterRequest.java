@@ -39,6 +39,6 @@ public class RegisterRequest {
     }
 
     public static boolean misformatted(RegisterRequest request){
-        return request.username == null | request.password == null;
+        return request.username == null | request.password == null | request.email == null;
     }
 }
