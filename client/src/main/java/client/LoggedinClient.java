@@ -107,7 +107,7 @@ public class LoggedinClient {
             }
             return "Exiting Game" + help();
 
-        }catch (NumberFormatException _){
+        }catch (NumberFormatException e){
             return formatError("Misformatted Request - Expected: 'play' <GAME NUMBER> <'black' | 'white'> : Game Number must be an Integer!");
         }
 
