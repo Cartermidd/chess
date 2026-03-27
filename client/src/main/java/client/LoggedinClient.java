@@ -125,7 +125,7 @@ public class LoggedinClient {
                 } else {
                     return formatError("Game does not exist");
                 }
-            }catch (NumberFormatException _){
+            }catch (NumberFormatException ex){
                 return formatError("Misformatted Request - Expected: 'observe' <GAME NUMBER> : Game Number must be an Integer!");
             }
         } catch (Exception ex){
