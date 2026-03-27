@@ -100,9 +100,7 @@ public class LoggedinClient {
                 }else{
                     return formatError("Game does not exist");
                 }
-            } catch (AlreadyTakenException ex){
-                return formatError(ex.getMessage());
-            } catch (NoGameException ex){
+            } catch (AlreadyTakenException | NoGameException ex){
                 return formatError(ex.getMessage());
             }
             return "Exiting Game" + help();
