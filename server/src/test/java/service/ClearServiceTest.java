@@ -8,13 +8,22 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ClearServiceTest {
 
-    private ClearService service;
+    private static ClearService service;
     private MemoryDataAccess dao;
 
     @BeforeEach
     public void setup() {
         dao = new MemoryDataAccess();
         service = new ClearService(dao, dao, dao);
+    }
+
+    @AfterAll
+    public static void finalClearDB() {
+        try {
+            service.clearDB();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.toString());
+        }
     }
 
     @Test
@@ -29,8 +38,8 @@ public class ClearServiceTest {
     @Test
     public void clearNegative() {
         assertThrows(Exception.class, ()->{
-            service = new ClearService(null, null, null);
-            service.clearDB();
+            ClearService nullService = new ClearService(null, null, null);
+            nullService.clearDB();
         }, "Throw an error when you try to clear using null DAO");
     }
 

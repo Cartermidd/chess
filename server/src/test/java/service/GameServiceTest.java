@@ -3,6 +3,7 @@ package service;
 import chess.ChessGame;
 import dataaccess.MemoryDataAccess;
 import exceptions.RegisterRequest;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,15 @@ public class GameServiceTest {
 
     @BeforeEach
     public void clearDB() {
+        try {
+            clearService.clearDB();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.toString());
+        }
+    }
+
+    @AfterAll
+    public static void finalClearDB() {
         try {
             clearService.clearDB();
         } catch (Exception ex) {
