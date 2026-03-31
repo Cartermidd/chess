@@ -2,6 +2,7 @@ package dataaccess;
 
 import models.*;
 import chess.*;
+import org.mindrot.jbcrypt.BCrypt;
 import results.CreateGameResult;
 import results.ListGamesResult;
 
@@ -24,7 +25,9 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
     @Override
     public void create(UserData user) throws DataAccessException{
         try {
-            usersByUsername.put(user.getUsername(), user);
+            String password = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+            UserData newUser = new UserData(user.getUsername(), password, user.email());
+            usersByUsername.put(user.getUsername(), newUser);
         } catch (Exception e) {
             throw new DataAccessException(e + " Data Access Error");
         }
