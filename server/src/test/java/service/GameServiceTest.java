@@ -22,20 +22,9 @@ public class GameServiceTest {
     private static UserService userService;
     private static MemoryDataAccess dao;
 
-    @BeforeAll
-    public static void setup() {
-        try {
-            dao = new MemoryDataAccess();
-            gameService = new GameService(dao, dao);
-            clearService = new ClearService(dao, dao, dao);
-            userService = new UserService(dao, dao);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex.toString());
-        }
-    }
 
     @BeforeEach
-    public void clearDB() {
+    public void clear() {
         try {
             clearService.clearDB();
         } catch (Exception ex) {
@@ -43,8 +32,21 @@ public class GameServiceTest {
         }
     }
 
+    @BeforeAll
+    public static void setup() {
+        try {
+            dao = new MemoryDataAccess();
+            clearService = new ClearService(dao, dao, dao);
+            userService = new UserService(dao, dao);
+            gameService = new GameService(dao, dao);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.toString());
+        }
+    }
+
+
     @AfterAll
-    public static void finalClearDB() {
+    public static void clearLast() {
         try {
             clearService.clearDB();
         } catch (Exception ex) {

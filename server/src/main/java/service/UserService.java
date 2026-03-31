@@ -25,9 +25,8 @@ public class UserService {
         {
             throw new AlreadyTakenException("Error: Username Taken");
         }
-        String hashedPassword = BCrypt.hashpw(request.getPassword(), BCrypt.gensalt());
 
-        UserData user = new UserData(request.getUsername(), hashedPassword, request.getEmail());
+        UserData user = new UserData(request.getUsername(), request.getPassword(), request.getEmail());
         userDAO.create(user);
 
         String authToken = GenerateAuthToken.generateAuthToken();
