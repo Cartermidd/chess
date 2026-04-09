@@ -1,5 +1,6 @@
 package dataaccess;
 
+import models.chess.ChessBoard;
 import models.chess.ChessGame;
 import models.AuthData;
 import models.GameData;
@@ -121,7 +122,7 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
     }
 
     @Override
-    public void updateGame(Integer id, ChessGame.TeamColor color, String username) throws DataAccessException {
+    public void updateGamePlayer(Integer id, ChessGame.TeamColor color, String username) throws DataAccessException {
         if (username == null){throw new DataAccessException("can't name user null");}
         if (color == ChessGame.TeamColor.BLACK){
             var statement = "UPDATE games SET blackusername = ? WHERE id=?";
@@ -143,6 +144,12 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
             var statement = "UPDATE games SET whiteusername = ? WHERE id=?";
             int newId = updateUsersGames(statement, null, id);
         }
+    }
+    
+    @Override
+    public void updateGame(Integer id, ChessGame game) throws DataAccessException{
+        var statement = "UPDATE games SET game = ? WHERE id=?";
+        updateUsersGames(statement, game, id);
     }
 
 

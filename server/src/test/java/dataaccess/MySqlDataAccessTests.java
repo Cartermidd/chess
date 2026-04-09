@@ -193,7 +193,7 @@ public class MySqlDataAccessTests {
             int id = game.getGameID();
             GameData data = dataAccess.findByID(id);
             Assertions.assertTrue(data.gameName().equals("user"));
-            dataAccess.updateGame(id, ChessGame.TeamColor.BLACK, "blackusername");
+            dataAccess.updateGamePlayer(id, ChessGame.TeamColor.BLACK, "blackusername");
             GameData data2 = dataAccess.findByID(id);
             Assertions.assertTrue(data2.blackUsername().equals("blackusername"));
         }catch (Exception e){
@@ -207,7 +207,7 @@ public class MySqlDataAccessTests {
         assertThrows(DataAccessException.class, ()->{
             CreateGameResult game = dataAccess.createGame("user");
             int id = game.getGameID();
-            dataAccess.updateGame(id, ChessGame.TeamColor.BLACK, null);
+            dataAccess.updateGamePlayer(id, ChessGame.TeamColor.BLACK, null);
         }, "Database shouldn't accept NULL as a username");
     }
 

@@ -1,6 +1,7 @@
 package dataaccess;
 
 import models.*;
+import models.chess.ChessBoard;
 import models.chess.ChessGame;
 import org.mindrot.jbcrypt.BCrypt;
 import results.CreateGameResult;
@@ -102,7 +103,7 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
     }
 
     @Override
-    public void updateGame(Integer id, ChessGame.TeamColor color, String username) throws DataAccessException {
+    public void updateGamePlayer(Integer id, ChessGame.TeamColor color, String username) throws DataAccessException {
         try{
             GameData game = gameById.get(id);
             gameById.remove(id);
@@ -132,6 +133,18 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
                 GameData updatedGame = new GameData(id, null, game.blackUsername(), game.gameName(), game.game());
                 gameById.put(id, updatedGame);
             }
+        } catch(Exception e){
+            throw new DataAccessException(e + " Data Access Error");
+        }
+    }
+
+    @Override
+    public void updateGame(Integer id, ChessGame newGame) throws DataAccessException{
+        try{
+            GameData game = gameById.get(id);
+            gameById.remove(id);
+            GameData updatedGame = new GameData(id, game.whiteUsername(), game.blackUsername(), game.gameName(), newGame);
+            gameById.put(id, updatedGame);
         } catch(Exception e){
             throw new DataAccessException(e + " Data Access Error");
         }

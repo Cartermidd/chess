@@ -60,7 +60,7 @@ public class GameService {
         } else {
             if (requestedColor == ChessGame.TeamColor.BLACK) {
                 if (game.blackUsername() == null) {
-                    gameDAO.updateGame(request.getGameId(), ChessGame.TeamColor.BLACK, username);
+                    gameDAO.updateGamePlayer(request.getGameId(), ChessGame.TeamColor.BLACK, username);
                     return new GenericSuccessfulResult();
                 } else {
                     throw new AlreadyTakenException("Error: Black is already taken");
@@ -68,7 +68,7 @@ public class GameService {
             }
             if (requestedColor == ChessGame.TeamColor.WHITE){
                 if (game.whiteUsername() == null){
-                    gameDAO.updateGame(request.getGameId(), ChessGame.TeamColor.WHITE, username);
+                    gameDAO.updateGamePlayer(request.getGameId(), ChessGame.TeamColor.WHITE, username);
                     return new GenericSuccessfulResult();
                 } else {
                     throw new AlreadyTakenException("Error: White is already taken");

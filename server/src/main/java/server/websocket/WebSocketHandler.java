@@ -114,6 +114,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void makeMove(WsMessageContext ctx, MakeMoveCommand command) throws IOException {
         try {
+            GameData gameData = command.move;
+             = gameDAO.findByID(command.getGameID());
+
+            ctx.send(new Gson().toJson(new LoadGameMessage(
+                    ServerMessage.ServerMessageType.LOAD_GAME,
+                    gameData.game()
+            )));
+
+
+
             String username = authDAO.findByAuth(command.getAuthToken()).userName();
             String role = roleString(command.getState());
             String move = command.move.toString();

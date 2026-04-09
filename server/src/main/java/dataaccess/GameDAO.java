@@ -1,5 +1,6 @@
 package dataaccess;
 
+import models.chess.ChessBoard;
 import models.chess.ChessGame;
 import models.GameData;
 import results.CreateGameResult;
@@ -13,7 +14,9 @@ public interface GameDAO {
 
     GameData findByID(Integer id) throws DataAccessException;
 
-    void updateGame(Integer id, ChessGame.TeamColor color, String username) throws DataAccessException;
+    void updateGamePlayer(Integer id, ChessGame.TeamColor color, String username) throws DataAccessException;
+
+    public void updateGame(Integer id, ChessGame newGame) throws DataAccessException;
 
     void clearPlayer(Integer id, ChessGame.TeamColor color) throws DataAccessException;
 
