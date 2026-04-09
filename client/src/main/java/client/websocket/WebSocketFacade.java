@@ -2,8 +2,10 @@ package client.websocket;
 
 import com.google.gson.Gson;
 import exceptions.ResponseException;
+import models.GameData;
 import models.chess.ChessGame;
 import models.chess.ChessMove;
+import models.chess.InvalidMoveException;
 import websocket.State;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
@@ -64,9 +66,10 @@ public class WebSocketFacade extends Endpoint {
     public void makeMove(String authToken, int gameID, ChessMove move, State state) throws ResponseException {
         try {
             var action = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move, state);
-
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
-        } catch (IOException ex) {
+//        } catch (InvalidMoveException ex) {
+//            throw new InvalidMoveException(ex.getMessage());
+        }catch (IOException ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
     }

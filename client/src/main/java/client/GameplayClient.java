@@ -8,6 +8,7 @@ import exceptions.ResponseException;
 import models.GameData;
 import models.chess.*;
 import server.ServerFacade;
+import server.websocket.WebSocketHandler;
 import websocket.State;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -66,7 +67,6 @@ public class GameplayClient implements ServerMessageHandler {
             //open a websocket connection using /ws endpoint, CONNECT websocket message to server
             this.gameData = gameData; //This should be received with the LOAD_GAME server message
             System.out.print(help());
-            System.out.print(printBoard(state, gameData.game().getBoard(), null));
 
             Scanner scannr = new Scanner(System.in);
             var result = "";
@@ -115,6 +115,7 @@ public class GameplayClient implements ServerMessageHandler {
             //updates board after successful move //needs websocket implementation
             //'move' <current position> <destination> <promotion (if needed)> (e.g. g7 h8 q)
             if(gameOver){return formatError("Can't make moves when the game is over");}
+            if(!gameData.game().getTeamTurn().equals(stateToColor(state))){return formatError("Can't make move when it's not your turn!");}
             try {
                 if(params.length < 2 | params.length > 3){
                     throw new ImproperRequestException("Misformatted Request - Expected: 'move' <current position> <destination> <promotion (if needed)> (e.g. g7 h8 q)");
@@ -127,29 +128,11 @@ public class GameplayClient implements ServerMessageHandler {
                     promotion = promotionPieceParce(params[2]);
                 }
                 ChessMove move = new ChessMove(startPosition,endPosition,promotion);
-                try {
-                    gameData.game().makeMove(move);
-                }catch (InvalidMoveException ex){
-                    return formatError(ex.getMessage());
-                }
-                ws.makeMove(authToken,id,move, state);
-                if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)){
-                    return printBoard(state, gameData.game().getBoard(), null);
-                } else if (gameData.game().isInCheck(ChessGame.TeamColor.WHITE)){
-                    return printBoard(state, gameData.game().getBoard(), null);
-                }
-                if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK)){
-                    gameOver = true;
-                    return printBoard(state, gameData.game().getBoard(), null);
-                } else if (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE)){
-                    gameOver = true;
-                    return printBoard(state, gameData.game().getBoard(), null);
-                }
-                if (gameData.game().isInStalemate(ChessGame.TeamColor.BLACK)){
-                    gameOver = true;
-                    return printBoard(state, gameData.game().getBoard(), null);
-                }
-                return printBoard(state, gameData.game().getBoard(), null);
+
+                ws.makeMove(authToken,id,move,state);
+
+                return "";
+
             } catch (Exception ex){
                 return formatError(ex.getMessage());
             }
@@ -316,6 +299,11 @@ public class GameplayClient implements ServerMessageHandler {
 
         private String gameLoss(State state){
             //Websocket -> teamColor has resigned
+            try {
+                ws.resignGame(authToken, id, state);
+            }catch (ResponseException ex){
+                return formatError(ex.getMessage());
+            }
             gameOver = true;
             //no more games
             return "game over.";
@@ -344,13 +332,6 @@ public class GameplayClient implements ServerMessageHandler {
         return SET_TEXT_COLOR_RED + error + RESET_TEXT_COLOR + "\n";
     }
 
-    private String formatCheck(String message){
-            return SET_TEXT_COLOR_YELLOW  + message + RESET_TEXT_COLOR + "\n";
-    }
-
-    private String formatStalemate(String message){
-        return SET_TEXT_COLOR_MAGENTA  + message + RESET_TEXT_COLOR + "\n";
-    }
 
     private ChessPosition positionParse(String input) throws MisformattedChessPositionException {
         if (input.length() != 2){
@@ -403,6 +384,10 @@ public class GameplayClient implements ServerMessageHandler {
         if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION){
             NotificationMessage note = (NotificationMessage) message;
             System.out.println("\n" + SET_TEXT_COLOR_YELLOW + note.getMessage() + RESET_TEXT_COLOR);
+            if (note.getMessage().equals("White wins!")|(note.getMessage().equals("Black wins!"))
+                    |(note.getMessage().equals("Stalemate!"))|(note.getMessage().contains("has resigned the game"))){
+                gameOver = true;
+            }
             printPrompt();
         }
         if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME){
@@ -414,12 +399,20 @@ public class GameplayClient implements ServerMessageHandler {
                     gameData.gameName(),
                     load.getGame()
             );
-            System.out.print(redraw(load.getGame().getBoard()));
+            System.out.print("\n" + redraw(load.getGame().getBoard()));
             printPrompt();
         }
         if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
             ErrorMessage error = (ErrorMessage) message;
             System.out.println(formatError(error.getErrorMessage()));
         }
+    }
+
+    private ChessGame.TeamColor stateToColor(State state){
+        return switch (state){
+            case BLACK -> ChessGame.TeamColor.BLACK;
+            case WHITE -> ChessGame.TeamColor.WHITE;
+            case OBSERVER -> null;
+        };
     }
 }

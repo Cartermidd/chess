@@ -10,6 +10,8 @@ import models.AuthData;
 import models.GameData;
 import models.chess.ChessGame;
 import models.chess.ChessMove;
+import models.chess.ChessPiece;
+import models.chess.InvalidMoveException;
 import server.Server;
 import server.ServerFacade;
 import websocket.State;
@@ -114,22 +116,46 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void makeMove(WsMessageContext ctx, MakeMoveCommand command) throws IOException {
         try {
-            GameData gameData = command.move;
-             = gameDAO.findByID(command.getGameID());
+            GameData gameData = gameDAO.findByID(command.getGameID());
+            ChessGame game = gameData.game();
 
-            ctx.send(new Gson().toJson(new LoadGameMessage(
-                    ServerMessage.ServerMessageType.LOAD_GAME,
-                    gameData.game()
-            )));
+            try{
+                game.makeMove(command.move);
+            }catch (InvalidMoveException ex){
+                ctx.send(new Gson().toJson( new ErrorMessage(ServerMessage.ServerMessageType.ERROR, ex.getMessage())));
+                return;
+            }
 
+            gameDAO.updateGame(command.getGameID(), game);
 
+            connections.broadcast(null, new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game));
 
             String username = authDAO.findByAuth(command.getAuthToken()).userName();
             String role = roleString(command.getState());
-            String move = command.move.toString();
+            String move = parceMove(command.move);
             var message = String.format("%s (%s) moved %s", username, role, move);
-            var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-            connections.broadcast(null, notification);
+            connections.broadcast(ctx.session, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
+            if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
+                var update = String.format("%s (black) is in checkmate",gameData.blackUsername());
+                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update));
+                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "White wins!"));
+            } else if (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE)){
+                var update = String.format("%s (white) is in checkmate",gameData.whiteUsername());
+                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update));
+                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Black wins!"));
+            }
+            if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)) {
+                var update = String.format("%s (black) is in check",gameData.blackUsername());
+                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update));
+            } else if (gameData.game().isInCheck(ChessGame.TeamColor.WHITE)){
+                var update = String.format("%s (white) is in check",gameData.whiteUsername());
+                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update));
+            }
+            if (gameData.game().isInStalemate(ChessGame.TeamColor.BLACK)) {
+                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Stalemate!"));
+            }
+
+
         } catch (DataAccessException ex) {
             throw new IOException("Unable to query database.");
         }
@@ -156,6 +182,24 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             case WHITE -> ChessGame.TeamColor.WHITE;
             case OBSERVER -> null;
         };
+    }
+
+    private String pieceToString(ChessPiece.PieceType pieceType){
+        return switch(pieceType){
+            case QUEEN -> "queen";
+            case KNIGHT -> "knight";
+            case BISHOP -> "bishop";
+            case ROOK -> "rook";
+            default -> "what???";
+        };
+    }
+
+    private String parceMove(ChessMove move){
+        if (move.getPromotionPiece() == null){
+            return String.format("from %s to %s", move.getStartPosition(), move.getEndPosition());
+        } else {
+            return String.format("from %s to %s, promoting to a %s", move.getStartPosition(), move.getEndPosition(), pieceToString(move.getPromotionPiece()));
+        }
     }
 
 }

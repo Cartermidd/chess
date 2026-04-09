@@ -149,7 +149,8 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
     @Override
     public void updateGame(Integer id, ChessGame game) throws DataAccessException{
         var statement = "UPDATE games SET game = ? WHERE id=?";
-        updateUsersGames(statement, game, id);
+        String serializedGame = ChessGame.serialize(game);
+        updateUsersGames(statement, serializedGame, id);
     }
 
 
