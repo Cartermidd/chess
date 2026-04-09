@@ -120,6 +120,25 @@ public class MemoryDataAccess implements AuthDAO, GameDAO, UserDAO {
     }
 
     @Override
+    public void clearPlayer(Integer id, ChessGame.TeamColor color) throws DataAccessException{
+        try{
+            GameData game = gameById.get(id);
+            gameById.remove(id);
+            if (color == ChessGame.TeamColor.BLACK){
+                GameData updatedGame = new GameData(id, game.whiteUsername(), null, game.gameName(), game.game());
+                gameById.put(id, updatedGame);
+            }
+            if (color == ChessGame.TeamColor.WHITE){
+                GameData updatedGame = new GameData(id, null, game.blackUsername(), game.gameName(), game.game());
+                gameById.put(id, updatedGame);
+            }
+        } catch(Exception e){
+            throw new DataAccessException(e + " Data Access Error");
+        }
+    }
+
+
+    @Override
     public void clear() throws DataAccessException {
         try {
             this.usersByAuth.clear();

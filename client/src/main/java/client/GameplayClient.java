@@ -9,6 +9,8 @@ import models.GameData;
 import models.chess.*;
 import server.ServerFacade;
 import websocket.State;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -321,6 +323,7 @@ public class GameplayClient implements ServerMessageHandler {
 
 
         public String leave() throws Exception{
+                ws.leaveGame(authToken,id,state);
                 return "quit";
             }
 
@@ -401,6 +404,22 @@ public class GameplayClient implements ServerMessageHandler {
             NotificationMessage note = (NotificationMessage) message;
             System.out.println("\n" + SET_TEXT_COLOR_YELLOW + note.getMessage() + RESET_TEXT_COLOR);
             printPrompt();
+        }
+        if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME){
+            LoadGameMessage load = (LoadGameMessage) message;
+            this.gameData = new GameData(
+                    gameData.gameID(),
+                    gameData.whiteUsername(),
+                    gameData.blackUsername(),
+                    gameData.gameName(),
+                    load.getGame()
+            );
+            System.out.print(redraw(load.getGame().getBoard()));
+            printPrompt();
+        }
+        if (message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
+            ErrorMessage error = (ErrorMessage) message;
+            System.out.println(formatError(error.getErrorMessage()));
         }
     }
 }

@@ -133,6 +133,18 @@ public class MySqlDataAccess implements GameDAO, UserDAO, AuthDAO {
         }
     }
 
+    @Override
+    public void clearPlayer(Integer id, ChessGame.TeamColor color) throws DataAccessException{
+        if (color == ChessGame.TeamColor.BLACK){
+            var statement = "UPDATE games SET blackusername = ? WHERE id=?";
+            int newId = updateUsersGames(statement, null, id);
+        }
+        if (color == ChessGame.TeamColor.WHITE){
+            var statement = "UPDATE games SET whiteusername = ? WHERE id=?";
+            int newId = updateUsersGames(statement, null, id);
+        }
+    }
+
 
     @Override
     public ListGamesResult listGames() throws DataAccessException {//I need to deserialize games

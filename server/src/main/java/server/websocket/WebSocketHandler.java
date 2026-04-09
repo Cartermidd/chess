@@ -7,12 +7,15 @@ import dataaccess.GameDAO;
 import exceptions.ResponseException;
 import io.javalin.websocket.*;
 import models.AuthData;
+import models.GameData;
+import models.chess.ChessGame;
 import models.chess.ChessMove;
 import server.Server;
 import server.ServerFacade;
 import websocket.State;
 import websocket.commands.*;
 import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -46,14 +49,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     MakeMoveCommand cmd = new Gson().fromJson(ctx.message(), MakeMoveCommand.class);
                     makeMove(ctx, cmd);
                 }
-                case RESIGN -> {
-                    ResignCommand cmd = new Gson().fromJson(ctx.message(), ResignCommand.class);
-                    resign(ctx, cmd);
-                }
-                case LEAVE -> {
-                    LeaveCommand cmd = new Gson().fromJson(ctx.message(), LeaveCommand.class);
-                    disconnect(ctx, cmd);
-                }
+                case RESIGN -> resign(ctx, command);
+                case LEAVE -> disconnect(ctx, command);
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -69,6 +66,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void connect(WsMessageContext ctx, UserGameCommand command) throws IOException {
         try {
             connections.add(ctx.session);
+            GameData gameData = gameDAO.findByID(command.getGameID());
+
+            ctx.send(new Gson().toJson(new LoadGameMessage(
+                    ServerMessage.ServerMessageType.LOAD_GAME,
+                    gameData.game()
+            )));
+
             String role = roleString(command.getState());
             AuthData user = authDAO.findByAuth(command.getAuthToken());
             var message = String.format("%s has joined the game as %s", user.userName(), role);
@@ -80,23 +84,26 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     }
 
-    private void disconnect(WsMessageContext ctx, LeaveCommand command) throws IOException{
-        String role = roleString(command.state);
+    private void disconnect(WsMessageContext ctx, UserGameCommand command) throws IOException{
         try{
             String username = authDAO.findByAuth(command.getAuthToken()).userName();
+            String role = roleString(command.getState());
             var message = String.format("%s (%s) has left the game", username, role);
             var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-            connections.remove(ctx.session);
             connections.broadcast(ctx.session, notification);
+            if (command.getState() != State.OBSERVER) {
+                gameDAO.clearPlayer(command.getGameID(), stateToColor(command.getState()));
+            }
+            connections.remove(ctx.session);
         } catch (DataAccessException ex){
             throw new IOException("Unable to query database.");
         }
     }
 
-    private void resign(WsMessageContext ctx, ResignCommand command) throws IOException{
-        String role = roleString(command.state);
+    private void resign(WsMessageContext ctx, UserGameCommand command) throws IOException{
         try{
             String username = authDAO.findByAuth(command.getAuthToken()).userName();
+            String role = roleString(command.getState());
             var message = String.format("%s (%s) has resigned the game", username, role);
             var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
             connections.broadcast(ctx.session, notification);
@@ -106,9 +113,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void makeMove(WsMessageContext ctx, MakeMoveCommand command) throws IOException {
-        String role = roleString(command.getState());
         try {
             String username = authDAO.findByAuth(command.getAuthToken()).userName();
+            String role = roleString(command.getState());
             String move = command.move.toString();
             var message = String.format("%s (%s) moved %s", username, role, move);
             var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
@@ -130,6 +137,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             case BLACK -> "black";
             case WHITE -> "white";
             case OBSERVER -> "observer";
+        };
+    }
+
+    private ChessGame.TeamColor stateToColor(State state){
+        return switch (state){
+            case BLACK -> ChessGame.TeamColor.BLACK;
+            case WHITE -> ChessGame.TeamColor.WHITE;
+            case OBSERVER -> null;
         };
     }
 
