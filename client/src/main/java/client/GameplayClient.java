@@ -234,11 +234,11 @@ public class GameplayClient {
             if (state == State.OBSERVER) {
                 return "An observer can't resign!!";
             }
-            try{
+            try{//asks user if they want to resign, if yes, forfeit game
             System.out.print("Are you sure you want to resign?\n('yes' will end the game, 'no' will continue the game)");
             Scanner scannr = new Scanner(System.in);
             var result = "";
-            while (!result.equals("no")&&!result.equals("NO")){
+            while (!result.equals("Continuing game")&&!result.equals("game over.")){
                 printPrompt();
                 String line = scannr.nextLine();
 
@@ -251,21 +251,20 @@ public class GameplayClient {
             }}catch (Exception ex) {
                 return formatError(ex.getMessage());
             }
-            return "You lose. :(";//asks user if they want to resign, if yes, forfeit game
+            return "\n" + redraw(gameData.game().getBoard());
             //needs websocket implementation
         }
 
         private String resignEval(String input){
             try{
-            if(input.length() != 1){
-                return "\nPlease type 'yes' to resign or 'no' to continue the game";
-            }
-            return switch (input) {
-                case "yes", "YES" -> gameLoss(state);
-                case "no", "NO" -> "no";
-                default -> "\nPlease type 'yes' to resign or 'no' to continue the game";
-            };
-            } catch (Exception ex){
+                String[] tokens = input.split(" ");
+                String command = (tokens.length == 1) ? tokens[0] : "default";
+                return switch (command) {
+                    case "yes", "YES" -> gameLoss(state);
+                    case "no", "NO" -> "Continuing game";
+                    default -> "\nPlease type 'yes' to resign or 'no' to continue the game";
+                };
+                } catch (Exception ex){
                 return formatError(ex.getMessage());
             }
         }
