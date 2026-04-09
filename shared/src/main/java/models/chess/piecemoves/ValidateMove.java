@@ -1,15 +1,15 @@
-package chess.piecemoves;
+package models.chess.piecemoves;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import models.chess.ChessBoard;
+import models.chess.ChessGame;
+import models.chess.ChessPiece;
+import models.chess.ChessPosition;
 
 public class ValidateMove {
 
     public static boolean validateMove(ChessBoard board, int row, int col, ChessGame.TeamColor myColor){
         if (col <= 8 & col >= 1 & row <= 8 & row >= 1){
-            chess.ChessPosition currPos = new ChessPosition(row, col);
+            ChessPosition currPos = new ChessPosition(row, col);
             if (board.getPiece(currPos) == null){
                 return true;
             } else {

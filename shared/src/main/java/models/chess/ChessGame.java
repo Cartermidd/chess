@@ -1,4 +1,4 @@
-package chess;
+package models.chess;
 
 import com.google.gson.Gson;
 

@@ -1,7 +1,12 @@
-package chess.piecemoves;
+package models.chess.piecemoves;
 import java.util.ArrayList;
 import chess.*;
-import static chess.piecemoves.MoveUntil.moveUntil;
+import models.chess.ChessBoard;
+import models.chess.ChessGame;
+import models.chess.ChessMove;
+import models.chess.ChessPosition;
+
+import static models.chess.piecemoves.MoveUntil.moveUntil;
 
 
 public class BishopMoves {

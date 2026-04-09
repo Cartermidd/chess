@@ -1,7 +1,7 @@
 package dataaccess;
 
 import models.*;
-import chess.*;
+import models.chess.ChessGame;
 import org.mindrot.jbcrypt.BCrypt;
 import results.CreateGameResult;
 import results.ListGamesResult;

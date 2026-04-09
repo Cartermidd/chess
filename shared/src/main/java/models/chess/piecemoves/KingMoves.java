@@ -1,8 +1,13 @@
-package chess.piecemoves;
+package models.chess.piecemoves;
 
 import chess.*;
+import models.chess.ChessBoard;
+import models.chess.ChessGame;
+import models.chess.ChessMove;
+import models.chess.ChessPosition;
+
 import java.util.ArrayList;
-import static chess.piecemoves.ValidateMove.validateMove;
+import static models.chess.piecemoves.ValidateMove.validateMove;
 
 public class KingMoves {
 

@@ -1,6 +1,6 @@
 package service;
 
-import chess.ChessGame;
+import models.chess.ChessGame;
 import dataaccess.MemoryDataAccess;
 import requests.RegisterRequest;
 import org.junit.jupiter.api.AfterAll;

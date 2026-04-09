@@ -1,6 +1,7 @@
-package chess;
+package models.chess;
 
 import chess.piecemoves.*;
+import models.chess.piecemoves.*;
 
 import java.util.Collection;
 
@@ -62,22 +63,22 @@ public class ChessPiece {
             return null;
             //throw new RuntimeException("no piece :-{");
         } else if (piece.type == PieceType.PAWN){
-            chess.piecemoves.PawnMoves moves = new PawnMoves();
+            PawnMoves moves = new PawnMoves();
             return moves.getPawnMoves(board, myPosition);
         } else if (piece.type == PieceType.ROOK){
-            chess.piecemoves.RookMoves moves = new RookMoves();
+            RookMoves moves = new RookMoves();
             return moves.getRookMoves(board, myPosition);
         } else if (piece.type == PieceType.KNIGHT) {
-            chess.piecemoves.KnightMoves moves = new KnightMoves();
+            KnightMoves moves = new KnightMoves();
             return moves.getKnightMoves(board, myPosition);
         }else if (piece.type == PieceType.BISHOP){
-            chess.piecemoves.BishopMoves moves = new BishopMoves();
+            BishopMoves moves = new BishopMoves();
             return moves.getBishopMoves(board, myPosition);
         } else if (piece.type == PieceType.QUEEN){
-            chess.piecemoves.QueenMoves moves = new QueenMoves();
+            QueenMoves moves = new QueenMoves();
             return moves.getQueenMoves(board, myPosition);
         } else if (piece.type == PieceType.KING){
-            chess.piecemoves.KingMoves moves = new KingMoves();
+            KingMoves moves = new KingMoves();
             return moves.getKingMoves(board, myPosition);
         } else {
             return null;

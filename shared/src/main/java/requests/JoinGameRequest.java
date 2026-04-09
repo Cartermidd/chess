@@ -1,8 +1,6 @@
 package requests;
 
-import chess.ChessGame;
-
-import java.util.Objects;
+import models.chess.ChessGame;
 
 public class JoinGameRequest {
     ChessGame.TeamColor playerColor;

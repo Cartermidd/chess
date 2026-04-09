@@ -1,6 +1,6 @@
 package dataaccess;
 
-import chess.ChessGame;
+import models.chess.ChessGame;
 import models.GameData;
 import results.CreateGameResult;
 import results.ListGamesResult;

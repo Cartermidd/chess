@@ -1,6 +1,6 @@
 package passoff.chess.extracredit;
 
-import chess.*;
+import models.chess.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

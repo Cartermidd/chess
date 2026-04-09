@@ -1,7 +1,6 @@
 package dataaccess;
 
-import chess.ChessGame;
-import com.google.gson.Gson;
+import models.chess.ChessGame;
 import models.AuthData;
 import models.GameData;
 import models.UserData;
@@ -14,7 +13,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;

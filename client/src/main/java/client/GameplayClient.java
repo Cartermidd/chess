@@ -1,9 +1,9 @@
 package client;
 
-import chess.*;
 import exceptions.ImproperRequestException;
 import exceptions.MisformattedChessPositionException;
 import models.GameData;
+import models.chess.*;
 
 
 import java.util.*;

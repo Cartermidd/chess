@@ -1,6 +1,6 @@
 package client;
 
-import chess.ChessGame;
+import models.chess.ChessGame;
 import exceptions.AlreadyTakenException;
 import exceptions.ImproperRequestException;
 import exceptions.NoGameException;

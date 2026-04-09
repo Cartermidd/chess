@@ -1,4 +1,4 @@
-package chess;
+package models.chess;
 import java.lang.Math;
 
 public class CheckChecker {
@@ -63,7 +63,7 @@ public class CheckChecker {
 
     private static boolean horseHelper(ChessBoard board, ChessGame.TeamColor teamColor, int row, int col){
         if (inBounds(row,col)){
-            chess.ChessPosition currPos = new ChessPosition(row, col);
+            ChessPosition currPos = new ChessPosition(row, col);
             if (board.getPiece(currPos) == null){
                 return false;
             } else if (board.getPiece(currPos).getTeamColor() != teamColor & board.getPiece(currPos).getPieceType() == ChessPiece.PieceType.KNIGHT){
@@ -134,13 +134,13 @@ public class CheckChecker {
     private static boolean pawnHelper(ChessBoard board, ChessGame.TeamColor teamColor, int kingRow, int kingCol) {
         if (teamColor == ChessGame.TeamColor.WHITE){
             if (inBounds(kingRow+1, kingCol+1)){
-                chess.ChessPosition currPos = new ChessPosition(kingRow+1, kingCol+1);
+                ChessPosition currPos = new ChessPosition(kingRow+1, kingCol+1);
                 if (board.getPiece(currPos) == null){}
                 else if (board.getPiece(currPos).getTeamColor() != teamColor &
                         board.getPiece(currPos).getPieceType() == ChessPiece.PieceType.PAWN){return true;}
             }
             if (inBounds(kingRow+1, kingCol-1)){
-                chess.ChessPosition currPos = new ChessPosition(kingRow+1, kingCol-1);
+                ChessPosition currPos = new ChessPosition(kingRow+1, kingCol-1);
                 if (board.getPiece(currPos) == null){}
                 else if (board.getPiece(currPos).getTeamColor() != teamColor &
                         board.getPiece(currPos).getPieceType() == ChessPiece.PieceType.PAWN){return true;}
@@ -148,13 +148,13 @@ public class CheckChecker {
         }
         if (teamColor == ChessGame.TeamColor.BLACK){
             if (inBounds(kingRow-1, kingCol+1)){
-                chess.ChessPosition currPos = new ChessPosition(kingRow-1, kingCol+1);
+                ChessPosition currPos = new ChessPosition(kingRow-1, kingCol+1);
                 if (board.getPiece(currPos) == null){}
                 else if (board.getPiece(currPos).getTeamColor() != teamColor &
                         board.getPiece(currPos).getPieceType() == ChessPiece.PieceType.PAWN){return true;}
             }
             if (inBounds(kingRow-1, kingCol-1)){
-                chess.ChessPosition currPos = new ChessPosition(kingRow-1, kingCol-1);
+                ChessPosition currPos = new ChessPosition(kingRow-1, kingCol-1);
                 if (board.getPiece(currPos) == null){}
                 else if (board.getPiece(currPos).getTeamColor() != teamColor &
                         board.getPiece(currPos).getPieceType() == ChessPiece.PieceType.PAWN){return true;}
