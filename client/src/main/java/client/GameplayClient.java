@@ -1,23 +1,42 @@
 package client;
 
+import client.websocket.ServerMessageHandler;
+import client.websocket.WebSocketFacade;
+import com.sun.nio.sctp.HandlerResult;
 import exceptions.ImproperRequestException;
 import exceptions.MisformattedChessPositionException;
+import exceptions.ResponseException;
 import models.GameData;
 import models.chess.*;
+import websocket.messages.ServerMessage;
 
 
+import javax.management.Notification;
 import java.util.*;
 
 import static ui.EscapeSequences.*;
 
 
-public class GameplayClient {
-        ServerFacade server;
-        State state;
-        GameData gameData;
+public class GameplayClient implements ServerMessageHandler {
+        private ServerFacade server;
+        private String serverUrl;
+        private State state;
+        private GameData gameData;
+        private WebSocketFacade ws;
+        private Boolean gameOver = false;
+        private String authToken;
+        private int id;
 
-        public GameplayClient(ServerFacade server) {
-            this.server = server;
+        public GameplayClient(ServerFacade server, String serverUrl, String authToken, int id) {
+            try {
+                this.server = server;
+                this.serverUrl = serverUrl;
+                this.authToken = authToken;
+                this.id = id;
+                this.ws = new WebSocketFacade(serverUrl, this);
+            }catch (Exception ex){
+                System.out.print(formatError("Failed to connect to server with the web socket"));
+            }
         }
 
     public String eval(String input){
@@ -40,6 +59,11 @@ public class GameplayClient {
 
         public void run(String userName, State state, GameData gameData){
             //open a websocket connection using /ws endpoint, CONNECT websocket message to server
+            try{
+                ws.makeConnection(authToken, id);
+            }catch (ResponseException ex){
+                throw new RuntimeException(ex.getMessage());
+            }
             this.state = state;
             this.gameData = gameData; //This should be received with the LOAD_GAME server message
             System.out.print(help());
@@ -91,6 +115,7 @@ public class GameplayClient {
         public String move(String[] params){
             //updates board after successful move //needs websocket implementation
             //'move' <current position> <destination> <promotion (if needed)> (e.g. g7 h8 q)
+            if(gameOver){return formatError("Can't make moves when the game is over");}
             try {
                 if(params.length < 2 | params.length > 3){
                     throw new ImproperRequestException("Misformatted Request - Expected: 'move' <current position> <destination> <promotion (if needed)> (e.g. g7 h8 q)");
@@ -232,6 +257,7 @@ public class GameplayClient {
 
 
         public String resign() {
+            if(gameOver){return formatError("Can't resign when the game is over");}
             if (state == State.OBSERVER) {
                 return "An observer can't resign!!";
             }
@@ -271,7 +297,8 @@ public class GameplayClient {
         }
 
         private String gameLoss(State state){
-          //Websocket -> teamColor has resigned
+            //Websocket -> teamColor has resigned
+            gameOver = true;
             //no more games
             return "game over.";
         };
@@ -343,4 +370,9 @@ public class GameplayClient {
         System.out.print("\n" + "\u001b[" + "0m" + "Chess Game >>> " + "\u001b[" + "32m");
     }
 
+
+    @Override
+    public void notify(ServerMessage notification) {
+
+    }
 }

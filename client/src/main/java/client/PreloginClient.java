@@ -16,10 +16,11 @@ import static ui.EscapeSequences.SET_TEXT_COLOR_RED;
 
 public class PreloginClient {
     private final ServerFacade server;
+    private final String serverUrl;
 
     public PreloginClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
-
+        this.serverUrl = serverUrl;
     }
 
     public void run(){
@@ -72,7 +73,7 @@ public class PreloginClient {
                 return formatError("Misformatted Request - Expected: 'login' <USERNAME> <PASSWORD>");
             }
             var result = server.login(request);
-            LoggedinClient logged = new LoggedinClient(server);
+            LoggedinClient logged = new LoggedinClient(server, serverUrl);
             logged.run(result.getAuthToken(), result.getUsername());
         } catch (IncorrectPasswordException ex) {
             return formatError("Incorrect Password");
@@ -94,7 +95,7 @@ public class PreloginClient {
                 return formatError("Misformatted Request - Expected: 'register' <username> <password> <email>");
             }
             RegisterResult result = server.register(request);
-            LoggedinClient logged = new LoggedinClient(server);
+            LoggedinClient logged = new LoggedinClient(server, serverUrl);
             logged.run(result.getAuthToken(), result.getUsername());
             return "";
         } catch (AlreadyTakenException ex){

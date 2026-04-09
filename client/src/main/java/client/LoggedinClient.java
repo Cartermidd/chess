@@ -23,9 +23,11 @@ public class LoggedinClient {
     String authToken = null;
     String userName = null;
     Map<Integer, GameData> gamesList = new HashMap<>();
+    String serverUrl;
 
-    public LoggedinClient(ServerFacade server) {
+    public LoggedinClient(ServerFacade server, String serverUrl) {
         this.server = server;
+        this.serverUrl = serverUrl;
     }
 
 
@@ -88,7 +90,7 @@ public class LoggedinClient {
                     GameData data = gamesList.get(request.getGameId());
                     int id = data.gameID();
                     server.joinGame(new JoinGameRequest(request.getPlayerColor(), id));
-                    GameplayClient gameplay = new GameplayClient(server);
+                    GameplayClient gameplay = new GameplayClient(server, serverUrl, authToken, id);
                     if (request.getPlayerColor() == ChessGame.TeamColor.BLACK){
                         gameplay.run(userName, State.BLACK, data);
                     } else if (request.getPlayerColor() == ChessGame.TeamColor.WHITE){
@@ -116,10 +118,10 @@ public class LoggedinClient {
             if(params.length != 1){
                 throw new ImproperRequestException("Misformatted Request - Expected: 'observe' <GAME NUMBER>");
             }
-            GameplayClient gameplay = new GameplayClient(server);
             try{
                 if (gamesList.containsKey(Integer.parseInt(params[0]))) {
                     GameData data = gamesList.get(Integer.parseInt(params[0]));
+                    GameplayClient gameplay = new GameplayClient(server, serverUrl, authToken, data.gameID());
                     gameplay.run(userName, State.OBSERVER, data);
                 } else {
                     return formatError("Game does not exist");
