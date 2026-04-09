@@ -415,4 +415,5 @@ public class GameplayClient implements ServerMessageHandler {
             case OBSERVER -> null;
         };
     }
+    //comment so I can test
 }
