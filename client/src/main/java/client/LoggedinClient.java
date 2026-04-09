@@ -88,7 +88,6 @@ public class LoggedinClient {
                     GameData data = gamesList.get(request.getGameId());
                     int id = data.gameID();
                     server.joinGame(new JoinGameRequest(request.getPlayerColor(), id));
-
                     GameplayClient gameplay = new GameplayClient(server);
                     if (request.getPlayerColor() == ChessGame.TeamColor.BLACK){
                         gameplay.run(userName, State.BLACK, data);

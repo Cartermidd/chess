@@ -39,8 +39,9 @@ public class GameplayClient {
     }
 
         public void run(String userName, State state, GameData gameData){
+            //open a websocket connection using /ws endpoint, CONNECT websocket message to server
             this.state = state;
-            this.gameData = gameData;
+            this.gameData = gameData; //This should be received with the LOAD_GAME server message
             System.out.print(help());
             System.out.print(printBoard(state, gameData.game().getBoard(), null));
 
