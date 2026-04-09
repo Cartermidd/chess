@@ -6,7 +6,7 @@ import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import exceptions.AlreadyTakenException;
 import exceptions.ImproperRequestException;
-import exceptions.RegisterRequest;
+import requests.RegisterRequest;
 import results.LoginResult;
 import service.UserService;
 

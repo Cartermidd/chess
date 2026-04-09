@@ -1,9 +1,8 @@
 package client;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+import exceptions.ImproperRequestException;
+import exceptions.MisformattedChessPositionException;
 import models.GameData;
 
 
@@ -16,7 +15,6 @@ public class GameplayClient {
         ServerFacade server;
         State state;
         GameData gameData;
-
 
         public GameplayClient(ServerFacade server) {
             this.server = server;
@@ -44,7 +42,7 @@ public class GameplayClient {
             this.state = state;
             this.gameData = gameData;
             System.out.print(help());
-            System.out.print(printBoard(state, gameData.game().getBoard()));
+            System.out.print(printBoard(state, gameData.game().getBoard(), null));
 
             Scanner scannr = new Scanner(System.in);
             var result = "";
@@ -65,27 +63,69 @@ public class GameplayClient {
         }
 
 
-        public String highlight(String[] params){
-            return "highlighting not yet implemented";
-        }
-
-        public String move(String[] params){
-            return "making moves is not yet implemented";
-        }
-
-        public String redraw(ChessBoard board) {
-            return (state == State.BLACK) ? printBoardBlack(board) : printBoardWhite(board);
-        }
-
-        private String printBoard(State view, ChessBoard board){
-            if (view == State.BLACK){
-                return printBoardBlack(board);
-            } else {
-                return printBoardWhite(board);
+        public String highlight(String[] params) {
+            //Highlight legal moves: 'highlight' <position> (e.g. g3)
+            try {
+                if(params.length != 1){
+                    throw new ImproperRequestException("Misformatted Request - Expected: 'highlight' <position> (e.g. g3)");
+                }
+                ChessPosition position = positionParse(params[0]);
+                if (gameData.game().getBoard().getPiece(position) == null){
+                    return printBoard(state, gameData.game().getBoard(), null) + "\n" + formatError("Select a square with a piece on it to highlight available moves!");
+                }
+                Collection<ChessPosition> moveEndPositions = new ArrayList<>(List.of());
+                moveEndPositions.add(position);
+                Collection<ChessMove> validmoves = gameData.game().validMoves(position);
+                if(validmoves != null){
+                    for (ChessMove move : validmoves){
+                        moveEndPositions.add(move.getEndPosition());
+                    }
+                }
+                return printBoard(state, gameData.game().getBoard(), moveEndPositions);
+            } catch (Exception ex){
+                return formatError(ex.getMessage());
             }
         }
 
-        private String printBoardWhite(ChessBoard board){
+        public String move(String[] params){
+            //updates board after successful move //needs websocket implementation
+            //'move' <current position> <destination> <promotion (if needed)> (e.g. g7 h8 q)
+            try {
+                if(params.length < 2 | params.length > 3){
+                    throw new ImproperRequestException("Misformatted Request - Expected: 'move' <current position> <destination> <promotion (if needed)> (e.g. g7 h8 q)");
+                }
+
+                ChessPosition startPosition = positionParse(params[0]);
+                ChessPosition endPosition = positionParse(params[1]);
+                ChessPiece.PieceType promotion = null;
+                if (params.length == 3) {
+                    promotion = promotionPieceParce(params[2]);
+                }
+                gameData.game().makeMove(new ChessMove(startPosition,endPosition,promotion));
+                //websocket
+                //update database gameData
+                //game over checks??
+                return printBoard(state, gameData.game().getBoard(), null);
+            } catch (Exception ex){
+                return formatError(ex.getMessage());
+            }
+        }
+
+
+
+    public String redraw(ChessBoard board) {
+            return (state == State.BLACK) ? printBoardBlack(board, null) : printBoardWhite(board, null);
+        }
+
+        private String printBoard(State view, ChessBoard board, Collection<ChessPosition> positions){
+            if (view == State.BLACK){
+                return printBoardBlack(board, positions);
+            } else {
+                return printBoardWhite(board, positions);
+            }
+        }
+
+        private String printBoardWhite(ChessBoard board, Collection<ChessPosition> positions){
 
 
             String[] columnLabels = {EMPTY," a "," b  "," c ","  d  "," e "," f  "," g "," h ",EMPTY};
@@ -100,7 +140,7 @@ public class GameplayClient {
             for (int i = 8; i>0; i--){
                 printBoard.append(RESET_BG_COLOR).append("\n").append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE).append(rowLabels[i-1]);
                 for (int j=1; j<9; j++){
-                    printBoard.append(pieceChecker(board,i,j));
+                    printBoard.append(pieceChecker(board,i,j,positions));
                 }
                 printBoard.append(RESET_BG_COLOR).append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE)
                         .append(rowLabels[i-1]).append(RESET_BG_COLOR);
@@ -113,7 +153,7 @@ public class GameplayClient {
             return printBoard.toString();
         }
 
-        private String printBoardBlack(ChessBoard board){
+        private String printBoardBlack(ChessBoard board, Collection<ChessPosition> positions){
             String[] columnLabels = {EMPTY," h  "," g ","  f "," e ","  d "," c ","  b "," a ",EMPTY};
             String[] rowLabels = {" 1 "," 2 "," 3 "," 4 "," 5 "," 6 "," 7 "," 8 "};
 
@@ -125,7 +165,7 @@ public class GameplayClient {
             for (int i = 1; i<9; i++){
                 printBoard.append(RESET_BG_COLOR).append("\n").append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE).append(rowLabels[i-1]);
                 for (int j=8; j>0; j--){
-                    printBoard.append(pieceChecker(board,i,j));
+                    printBoard.append(pieceChecker(board,i,j,positions));
                 }
                 printBoard.append(RESET_BG_COLOR).append(SET_TEXT_COLOR_BLACK).append(SET_BG_COLOR_BLUE)
                         .append(rowLabels[i-1]).append(RESET_BG_COLOR);
@@ -138,10 +178,20 @@ public class GameplayClient {
             return printBoard.toString();
         }
 
-        private String pieceChecker(ChessBoard board, int row, int col){
-            boolean lightSquare = (row+col) % 2 != 1;
-            String bgColor = lightSquare ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY;
+        private String pieceChecker(ChessBoard board, int row, int col, Collection<ChessPosition> positions) {
+            boolean lightSquare = (row + col) % 2 != 1;
+            String bgColor;
             ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+            if (positions == null) {
+                bgColor = lightSquare ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY;
+            } else {
+                if (positions.contains(new ChessPosition(row, col))){
+                    bgColor = lightSquare ? SET_BG_COLOR_DARK_GREEN : SET_BG_COLOR_GREEN;
+                } else {
+                    bgColor = lightSquare ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY;
+                }
+            }
+
 
             if (piece == null){
                 return bgColor + EMPTY;
@@ -184,8 +234,41 @@ public class GameplayClient {
             if (state == State.OBSERVER) {
                 return "An observer can't resign!!";
             }
-            return "resign functionality not yet implemented";
+            try{
+            System.out.print("Are you sure you want to resign? ('yes' will end the game, 'no' will return you to your game)");
+            Scanner scannr = new Scanner(System.in);
+            var result = "";
+            while (!result.equals("no")&&!result.equals("NO")){
+                printPrompt();
+                String line = scannr.nextLine();
+                try {
+                    result = resignEval(line);
+                    System.out.print(result);
+                } catch (Exception ex) {
+
+                }
+            }}catch (Exception ex) {
+                return formatError(ex.getMessage());
+            }
+            return "You lose. :(";//asks user if they want to resign, if yes, forfeit game
+            //needs websocket implementation
         }
+
+        private String resignEval(String input){
+            String[] tokens = input.toLowerCase().split(" ");
+            String cmd = (tokens.length > 0) ? tokens[0] : "help";
+            String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            return switch (cmd) {
+                case "highlight", "h" -> highlight(params);
+                case "move", "m" -> move(params);
+                case "redraw", "r" -> redraw(gameData.game().getBoard());
+                case "resign", "s" -> resign();
+                case "leave", "l" -> leave();
+                default -> help();
+            };
+        } catch (Exception ex){
+        throw new RuntimeException(ex.getMessage());
+    }}}
 
         public String leave() throws Exception{
                 return "quit";
@@ -196,13 +279,58 @@ public class GameplayClient {
                 
                 Options:
                 Highlight legal moves: 'highlight' <position> (e.g. g3)
-                Make a move: 'move' <current postion> <destination> <promotion (if needed)> (e.g. g7 h8 q)
+                Make a move: 'move' <current position> <destination> <promotion (if needed)> (e.g. g7 h8 q)
                 Redraw Chess Board: "redraw"
                 Resign: "resign"
                 Leave game: "leave"
                 To print a list of possible commands: 'help'
                 """;
         }
+
+    private String formatError(String error){
+        return SET_TEXT_COLOR_RED + error + RESET_TEXT_COLOR + "\n";
+    }
+
+    private ChessPosition positionParse(String input) throws MisformattedChessPositionException {
+        if (input.length() != 2){
+            throw new MisformattedChessPositionException("Chess Position must be formatted column letter (a-h) row number (1-8) - (e.g. g7)");
+        }
+        int col = colLetterToInt(input);
+        try {
+            char rowNumber = input.charAt(1);
+            int row = Integer.parseInt(String.valueOf(rowNumber));
+            if (row > 8 | row < 1){throw new MisformattedChessPositionException("Chess Position must be formatted column letter (a-h) row number (1-8) - (e.g. g7)");}
+            return new ChessPosition(row, col);
+        }catch (NumberFormatException ex){
+            throw new MisformattedChessPositionException("Chess Position must be formatted column letter (a-h) row number (1-8) - (e.g. g7)");
+        }
+    }
+
+    private ChessPiece.PieceType promotionPieceParce(String piece) throws MisformattedChessPositionException {
+        char pieceChar = piece.charAt(0);
+        return switch (pieceChar) {
+            case 'q', 'Q' -> ChessPiece.PieceType.QUEEN;
+            case 'r', 'R' -> ChessPiece.PieceType.ROOK;
+            case 'b', 'B' -> ChessPiece.PieceType.BISHOP;
+            case 'k', 'K' -> ChessPiece.PieceType.KNIGHT;
+            default -> throw new MisformattedChessPositionException("Promotion Chess Piece must be formatted with the first letter of a promotion piece (q,r,b,k)");
+        };
+    }
+
+    private static int colLetterToInt(String input) throws MisformattedChessPositionException {
+        char colLetter = input.charAt(0);
+        return switch (colLetter) {
+            case 'a', 'A' -> 1;
+            case 'b', 'B' -> 2;
+            case 'c', 'C' -> 3;
+            case 'd', 'D' -> 4;
+            case 'e', 'E' -> 5;
+            case 'f', 'F' -> 6;
+            case 'g', 'G' -> 7;
+            case 'h', 'H' -> 8;
+            default -> throw new MisformattedChessPositionException("Chess Position must be formatted column letter (a-h) row number (1-8) - (e.g. g7)");
+        };
+    }
 
     private static void printPrompt() {
         System.out.print("\n" + "\u001b[" + "0m" + "Chess Game >>> " + "\u001b[" + "32m");

@@ -2,7 +2,7 @@ package client;
 
 import com.google.gson.Gson;
 import exceptions.IncorrectPasswordException;
-import exceptions.RegisterRequest;
+import requests.RegisterRequest;
 import exceptions.UserDoesNotExistException;
 import results.*;
 import requests.*;

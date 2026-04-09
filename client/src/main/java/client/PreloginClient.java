@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 import exceptions.AlreadyTakenException;
 import exceptions.IncorrectPasswordException;
-import exceptions.RegisterRequest;
+import requests.RegisterRequest;
 import exceptions.UserDoesNotExistException;
 import requests.*;
 import results.*;

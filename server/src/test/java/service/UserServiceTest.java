@@ -1,16 +1,12 @@
 package service;
 
-import chess.ChessGame;
 import dataaccess.MemoryDataAccess;
-import exceptions.RegisterRequest;
+import requests.RegisterRequest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import requests.CreateGameRequest;
-import requests.JoinGameRequest;
 import requests.LoginRequest;
-import results.CreateGameResult;
 import results.LoginResult;
 
 import static org.junit.jupiter.api.Assertions.*;
