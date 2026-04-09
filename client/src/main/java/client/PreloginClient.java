@@ -10,6 +10,7 @@ import requests.RegisterRequest;
 import exceptions.UserDoesNotExistException;
 import requests.*;
 import results.*;
+import server.ServerFacade;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 import static ui.EscapeSequences.SET_TEXT_COLOR_RED;

@@ -2,16 +2,17 @@ package client;
 
 import client.websocket.ServerMessageHandler;
 import client.websocket.WebSocketFacade;
-import com.sun.nio.sctp.HandlerResult;
 import exceptions.ImproperRequestException;
 import exceptions.MisformattedChessPositionException;
 import exceptions.ResponseException;
 import models.GameData;
 import models.chess.*;
+import server.ServerFacade;
+import websocket.State;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 
-import javax.management.Notification;
 import java.util.*;
 
 import static ui.EscapeSequences.*;
@@ -27,13 +28,15 @@ public class GameplayClient implements ServerMessageHandler {
         private String authToken;
         private int id;
 
-        public GameplayClient(ServerFacade server, String serverUrl, String authToken, int id) {
+        public GameplayClient(ServerFacade server, String serverUrl, String authToken, int id, State state) {
             try {
                 this.server = server;
                 this.serverUrl = serverUrl;
                 this.authToken = authToken;
                 this.id = id;
                 this.ws = new WebSocketFacade(serverUrl, this);
+                this.state = state;
+                this.ws.makeConnection(authToken,id,this.state);
             }catch (Exception ex){
                 System.out.print(formatError("Failed to connect to server with the web socket"));
             }
@@ -59,12 +62,6 @@ public class GameplayClient implements ServerMessageHandler {
 
         public void run(String userName, State state, GameData gameData){
             //open a websocket connection using /ws endpoint, CONNECT websocket message to server
-            try{
-                ws.makeConnection(authToken, id);
-            }catch (ResponseException ex){
-                throw new RuntimeException(ex.getMessage());
-            }
-            this.state = state;
             this.gameData = gameData; //This should be received with the LOAD_GAME server message
             System.out.print(help());
             System.out.print(printBoard(state, gameData.game().getBoard(), null));
@@ -127,10 +124,29 @@ public class GameplayClient implements ServerMessageHandler {
                 if (params.length == 3) {
                     promotion = promotionPieceParce(params[2]);
                 }
-                gameData.game().makeMove(new ChessMove(startPosition,endPosition,promotion));
-                //websocket
-                //update database gameData
-                //game over checks??
+                ChessMove move = new ChessMove(startPosition,endPosition,promotion);
+                try {
+                    gameData.game().makeMove(move);
+                }catch (InvalidMoveException ex){
+                    return formatError(ex.getMessage());
+                }
+                ws.makeMove(authToken,id,move, state);
+                if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)){
+                    return printBoard(state, gameData.game().getBoard(), null);
+                } else if (gameData.game().isInCheck(ChessGame.TeamColor.WHITE)){
+                    return printBoard(state, gameData.game().getBoard(), null);
+                }
+                if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK)){
+                    gameOver = true;
+                    return printBoard(state, gameData.game().getBoard(), null);
+                } else if (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE)){
+                    gameOver = true;
+                    return printBoard(state, gameData.game().getBoard(), null);
+                }
+                if (gameData.game().isInStalemate(ChessGame.TeamColor.BLACK)){
+                    gameOver = true;
+                    return printBoard(state, gameData.game().getBoard(), null);
+                }
                 return printBoard(state, gameData.game().getBoard(), null);
             } catch (Exception ex){
                 return formatError(ex.getMessage());
@@ -325,6 +341,14 @@ public class GameplayClient implements ServerMessageHandler {
         return SET_TEXT_COLOR_RED + error + RESET_TEXT_COLOR + "\n";
     }
 
+    private String formatCheck(String message){
+            return SET_TEXT_COLOR_YELLOW  + message + RESET_TEXT_COLOR + "\n";
+    }
+
+    private String formatStalemate(String message){
+        return SET_TEXT_COLOR_MAGENTA  + message + RESET_TEXT_COLOR + "\n";
+    }
+
     private ChessPosition positionParse(String input) throws MisformattedChessPositionException {
         if (input.length() != 2){
             throw new MisformattedChessPositionException("Chess Position must be formatted column letter (a-h) row number (1-8) - (e.g. g7)");
@@ -372,7 +396,11 @@ public class GameplayClient implements ServerMessageHandler {
 
 
     @Override
-    public void notify(ServerMessage notification) {
-
+    public void notify(ServerMessage message) {
+        if (message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION){
+            NotificationMessage note = (NotificationMessage) message;
+            System.out.println("\n" + SET_TEXT_COLOR_YELLOW + note.getMessage() + RESET_TEXT_COLOR);
+            printPrompt();
+        }
     }
 }

@@ -21,7 +21,7 @@ public class ServerMain {
             var clearService = new ClearService(userDAO, gameDAO, authDAO);
             var gameService = new GameService(authDAO, gameDAO);
             var userService = new UserService(userDAO, authDAO);
-            Server server = new Server(userService, gameService, clearService);
+            Server server = new Server();
             server.run(port);
 
             port = server.port();

@@ -9,6 +9,8 @@ import requests.AuthorizedRequest;
 import requests.CreateGameRequest;
 import requests.JoinGameRequest;
 import results.ListGamesResult;
+import server.ServerFacade;
+import websocket.State;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -90,10 +92,12 @@ public class LoggedinClient {
                     GameData data = gamesList.get(request.getGameId());
                     int id = data.gameID();
                     server.joinGame(new JoinGameRequest(request.getPlayerColor(), id));
-                    GameplayClient gameplay = new GameplayClient(server, serverUrl, authToken, id);
+                    GameplayClient gameplay;
                     if (request.getPlayerColor() == ChessGame.TeamColor.BLACK){
+                        gameplay = new GameplayClient(server, serverUrl, authToken, id, State.BLACK);
                         gameplay.run(userName, State.BLACK, data);
                     } else if (request.getPlayerColor() == ChessGame.TeamColor.WHITE){
+                        gameplay = new GameplayClient(server, serverUrl, authToken, id, State.WHITE);
                         gameplay.run(userName, State.WHITE, data);
                     } else {
                         return formatError("Something went wrong in gameplay request");
@@ -121,7 +125,7 @@ public class LoggedinClient {
             try{
                 if (gamesList.containsKey(Integer.parseInt(params[0]))) {
                     GameData data = gamesList.get(Integer.parseInt(params[0]));
-                    GameplayClient gameplay = new GameplayClient(server, serverUrl, authToken, data.gameID());
+                    GameplayClient gameplay = new GameplayClient(server, serverUrl, authToken, data.gameID(), State.OBSERVER);
                     gameplay.run(userName, State.OBSERVER, data);
                 } else {
                     return formatError("Game does not exist");

@@ -5,6 +5,7 @@ import requests.RegisterRequest;
 import org.junit.jupiter.api.*;
 import requests.*;
 import server.Server;
+import server.ServerFacade;
 
 import static org.junit.jupiter.api.Assertions.*;
 
