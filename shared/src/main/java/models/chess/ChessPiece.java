@@ -1,6 +1,6 @@
 package models.chess;
 
-import chess.piecemoves.*;
+import models.chess.piecemoves.*;
 import models.chess.piecemoves.*;
 
 import java.util.Collection;

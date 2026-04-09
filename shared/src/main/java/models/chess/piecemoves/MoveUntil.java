@@ -1,6 +1,5 @@
 package models.chess.piecemoves;
 
-import chess.*;
 import models.chess.*;
 
 import java.util.ArrayList;

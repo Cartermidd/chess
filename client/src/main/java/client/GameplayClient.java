@@ -235,17 +235,18 @@ public class GameplayClient {
                 return "An observer can't resign!!";
             }
             try{
-            System.out.print("Are you sure you want to resign? ('yes' will end the game, 'no' will return you to your game)");
+            System.out.print("Are you sure you want to resign?\n('yes' will end the game, 'no' will continue the game)");
             Scanner scannr = new Scanner(System.in);
             var result = "";
             while (!result.equals("no")&&!result.equals("NO")){
                 printPrompt();
                 String line = scannr.nextLine();
+
                 try {
                     result = resignEval(line);
                     System.out.print(result);
                 } catch (Exception ex) {
-
+                    System.out.print(formatError(ex.getMessage()));
                 }
             }}catch (Exception ex) {
                 return formatError(ex.getMessage());
@@ -255,20 +256,26 @@ public class GameplayClient {
         }
 
         private String resignEval(String input){
-            String[] tokens = input.toLowerCase().split(" ");
-            String cmd = (tokens.length > 0) ? tokens[0] : "help";
-            String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            return switch (cmd) {
-                case "highlight", "h" -> highlight(params);
-                case "move", "m" -> move(params);
-                case "redraw", "r" -> redraw(gameData.game().getBoard());
-                case "resign", "s" -> resign();
-                case "leave", "l" -> leave();
-                default -> help();
+            try{
+            if(input.length() != 1){
+                return "\nPlease type 'yes' to resign or 'no' to continue the game";
+            }
+            return switch (input) {
+                case "yes", "YES" -> gameLoss(state);
+                case "no", "NO" -> "no";
+                default -> "\nPlease type 'yes' to resign or 'no' to continue the game";
             };
-        } catch (Exception ex){
-        throw new RuntimeException(ex.getMessage());
-    }}}
+            } catch (Exception ex){
+                return formatError(ex.getMessage());
+            }
+        }
+
+        private String gameLoss(State state){
+          //Websocket -> teamColor has resigned
+            //no more games
+            return "game over.";
+        };
+
 
         public String leave() throws Exception{
                 return "quit";
