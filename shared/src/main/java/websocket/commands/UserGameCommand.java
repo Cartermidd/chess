@@ -18,13 +18,13 @@ public class UserGameCommand {
 
     private final Integer gameID;
 
-    private final State state;
 
-    public UserGameCommand(CommandType commandType, String authToken, Integer gameID, State state) {
+
+    public UserGameCommand(CommandType commandType, String authToken, Integer gameID) {
         this.commandType = commandType;
         this.authToken = authToken;
         this.gameID = gameID;
-        this.state = state;
+
     }
 
     public enum CommandType {
@@ -45,8 +45,6 @@ public class UserGameCommand {
     public Integer getGameID() {
         return gameID;
     }
-
-    public State getState(){return state;}
 
     @Override
     public boolean equals(Object o) {

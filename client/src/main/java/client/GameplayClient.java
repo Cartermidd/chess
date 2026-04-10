@@ -38,7 +38,7 @@ public class GameplayClient implements ServerMessageHandler {
                 this.id = id;
                 this.ws = new WebSocketFacade(serverUrl, this);
                 this.state = state;
-                this.ws.makeConnection(authToken,id,this.state);
+                this.ws.makeConnection(authToken,id);
             }catch (Exception ex){
                 System.out.print(formatError("Failed to connect to server with the web socket"));
             }
@@ -130,7 +130,7 @@ public class GameplayClient implements ServerMessageHandler {
                 }
                 ChessMove move = new ChessMove(startPosition,endPosition,promotion);
 
-                ws.makeMove(authToken,id,move,state);
+                ws.makeMove(authToken,id,move);
 
                 return "";
 
@@ -301,7 +301,7 @@ public class GameplayClient implements ServerMessageHandler {
         private String gameLoss(State state){
             //Websocket -> teamColor has resigned
             try {
-                ws.resignGame(authToken, id, state);
+                ws.resignGame(authToken, id);
             }catch (ResponseException ex){
                 return formatError(ex.getMessage());
             }
@@ -312,7 +312,7 @@ public class GameplayClient implements ServerMessageHandler {
 
 
         public String leave() throws Exception{
-                ws.leaveGame(authToken,id,state);
+                ws.leaveGame(authToken,id);
                 return "quit";
             }
 

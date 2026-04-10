@@ -65,14 +65,24 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         try {
             connections.add(ctx.session);
             GameData gameData = gameDAO.findByID(command.getGameID());
-
+            if (gameData == null){
+                ctx.send(new Gson().toJson(new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR, "Game not found")));
+                return;
+            }
+            AuthData user = authDAO.findByAuth(command.getAuthToken());
+            if (user == null){
+                ctx.send(new Gson().toJson(new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR, "Invalid auth token")));
+                return;
+            }
             ctx.send(new Gson().toJson(new LoadGameMessage(
                     ServerMessage.ServerMessageType.LOAD_GAME,
                     gameData.game()
             )));
 
-            String role = roleString(command.getState());
-            AuthData user = authDAO.findByAuth(command.getAuthToken());
+
+            String role = roleString(determineRole(user.userName(), gameData));
             var message = String.format("%s has joined the game as %s", user.userName(), role);
             var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
             connections.broadcast(ctx.session, notification); // send notification
@@ -85,12 +95,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void disconnect(WsMessageContext ctx, UserGameCommand command) throws IOException{
         try{
             String username = authDAO.findByAuth(command.getAuthToken()).userName();
-            String role = roleString(command.getState());
+            GameData gameData = gameDAO.findByID(command.getGameID());
+            State state = determineRole(username, gameData);
+            String role = roleString(state);
             var message = String.format("%s (%s) has left the game", username, role);
             var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
             connections.broadcast(ctx.session, notification);
-            if (command.getState() != State.OBSERVER) {
-                gameDAO.clearPlayer(command.getGameID(), stateToColor(command.getState()));
+            if (role != "observer") {
+                gameDAO.clearPlayer(command.getGameID(), stateToColor(state));
             }
             connections.remove(ctx.session);
         } catch (DataAccessException ex){
@@ -101,10 +113,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void resign(WsMessageContext ctx, UserGameCommand command) throws IOException{
         try{
             String username = authDAO.findByAuth(command.getAuthToken()).userName();
-            String role = roleString(command.getState());
-            var message = String.format("%s (%s) has resigned the game", username, role);
+            GameData gameData = gameDAO.findByID(command.getGameID());
+            State state = determineRole(username, gameData);
+            if (state == State.OBSERVER){
+                ctx.send(new Gson().toJson(new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Observers can't resign")));
+                return;
+            }
+
+            var message = String.format("%s (%s) has resigned the game", username, state);
             var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-            connections.broadcast(ctx.session, notification);
+            connections.broadcast(null, notification);
         } catch (DataAccessException ex){
             throw new IOException("Unable to query database.");
         }
@@ -112,7 +130,33 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void makeMove(WsMessageContext ctx, MakeMoveCommand command) throws IOException {
         try {
+            AuthData user = authDAO.findByAuth(command.getAuthToken());
+            if (user == null){
+                ctx.send(new Gson().toJson(new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR, "Invalid auth token")));
+                return;
+            }
+
             GameData gameData = gameDAO.findByID(command.getGameID());
+            if (gameData == null){
+                ctx.send(new Gson().toJson(new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR, "Game not found")));
+                return;
+            }
+            State role = determineRole(user.userName(), gameData);
+            if (role == State.OBSERVER){
+                ctx.send(new Gson().toJson(new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR, "Observers cannot make moves")));
+                return;
+            }
+
+            if (gameData.game().getTeamTurn() != stateToColor(role)){
+                ctx.send(new Gson().toJson(new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR, "Not your turn")));
+                return;
+            }
+
+
             ChessGame game = gameData.game();
 
             try{
@@ -127,27 +171,25 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connections.broadcast(null, new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game));
 
             String username = authDAO.findByAuth(command.getAuthToken()).userName();
-            String role = roleString(command.getState());
+
             String move = parceMove(command.move);
             var message = String.format("%s (%s) moved %s", username, role, move);
             connections.broadcast(ctx.session, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
-            if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
-                var update = String.format("%s (black) is in checkmate",gameData.blackUsername());
-                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update));
-                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "White wins!"));
-            } else if (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE)){
-                var update = String.format("%s (white) is in checkmate",gameData.whiteUsername());
-                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update));
-                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Black wins!"));
-            }
-            if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)) {
+            if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK) | (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE))){
+                if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
+                    var update = String.format("%s (black) is in checkmate",gameData.blackUsername());
+                    connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update + "White wins!"));
+                } else if (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE)){
+                    var update = String.format("%s (white) is in checkmate",gameData.whiteUsername());
+                    connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update + "Black wins!"));
+                }
+            } else if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)) {
                 var update = String.format("%s (black) is in check",gameData.blackUsername());
                 connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update));
             } else if (gameData.game().isInCheck(ChessGame.TeamColor.WHITE)){
                 var update = String.format("%s (white) is in check",gameData.whiteUsername());
                 connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update));
-            }
-            if (gameData.game().isInStalemate(ChessGame.TeamColor.BLACK)) {
+            } else if (gameData.game().isInStalemate(ChessGame.TeamColor.BLACK)) {
                 connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Stalemate!"));
             }
 
@@ -190,6 +232,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return String.format("from %s to %s, promoting to a %s", move.getStartPosition(),
                     move.getEndPosition(), pieceToString(move.getPromotionPiece()));
         }
+    }
+
+    private State determineRole(String username, GameData gameData){
+        if (username.equals(gameData.whiteUsername())){return State.WHITE;}
+        if (username.equals(gameData.blackUsername())){return State.BLACK;}
+        return State.OBSERVER;
     }
 
 }

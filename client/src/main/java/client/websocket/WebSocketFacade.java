@@ -2,9 +2,7 @@ package client.websocket;
 
 import com.google.gson.Gson;
 import exceptions.ResponseException;
-import chess.ChessGame;
 import chess.ChessMove;
-import websocket.State;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.*;
@@ -52,18 +50,18 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void makeConnection(String authToken, int gameID, State state) throws ResponseException {
+    public void makeConnection(String authToken, int gameID) throws ResponseException {
         try {
-            var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID, state);
+            var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
     }
 
-    public void makeMove(String authToken, int gameID, ChessMove move, State state) throws ResponseException {
+    public void makeMove(String authToken, int gameID, ChessMove move) throws ResponseException {
         try {
-            var action = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move, state);
+            var action = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
 //        } catch (InvalidMoveException ex) {
 //            throw new InvalidMoveException(ex.getMessage());
@@ -72,18 +70,18 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void leaveGame(String authToken, int gameID, State state) throws ResponseException {
+    public void leaveGame(String authToken, int gameID) throws ResponseException {
         try {
-            var action = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID, state);
+            var action = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
     }
 
-    public void resignGame(String authToken, int gameID, State state) throws ResponseException {
+    public void resignGame(String authToken, int gameID) throws ResponseException {
         try {
-            var action = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID, state);
+            var action = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
