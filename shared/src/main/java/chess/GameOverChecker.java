@@ -1,4 +1,4 @@
-package models.chess;
+package chess;
 
 import java.util.Collection;
 import java.util.List;

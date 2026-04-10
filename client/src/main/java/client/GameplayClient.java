@@ -1,14 +1,13 @@
 package client;
 
+import chess.*;
 import client.websocket.ServerMessageHandler;
 import client.websocket.WebSocketFacade;
 import exceptions.ImproperRequestException;
 import exceptions.MisformattedChessPositionException;
 import exceptions.ResponseException;
 import models.GameData;
-import models.chess.*;
 import server.ServerFacade;
-import server.websocket.WebSocketHandler;
 import websocket.State;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;

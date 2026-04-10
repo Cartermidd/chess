@@ -1,13 +1,13 @@
-package models.chess.piecemoves;
+package chess.piecemoves;
 
-import models.chess.*;
-import models.chess.ChessBoard;
-import models.chess.ChessGame;
-import models.chess.ChessMove;
-import models.chess.ChessPosition;
+import chess.*;
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 
 import java.util.ArrayList;
-import static models.chess.piecemoves.ValidateMove.validateMove;
+import static chess.piecemoves.ValidateMove.validateMove;
 
 public class KnightMoves {
 

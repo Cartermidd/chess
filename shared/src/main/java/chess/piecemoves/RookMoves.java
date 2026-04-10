@@ -1,12 +1,12 @@
-package models.chess.piecemoves;
+package chess.piecemoves;
 import java.util.ArrayList;
-import models.chess.*;
-import models.chess.ChessBoard;
-import models.chess.ChessGame;
-import models.chess.ChessMove;
-import models.chess.ChessPosition;
+import chess.*;
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 
-import static models.chess.piecemoves.MoveUntil.moveUntil;
+import static chess.piecemoves.MoveUntil.moveUntil;
 
 
 public class RookMoves {

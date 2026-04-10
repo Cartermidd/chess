@@ -1,9 +1,9 @@
-package models.chess.piecemoves;
+package chess.piecemoves;
 
-import models.chess.ChessBoard;
-import models.chess.ChessGame;
-import models.chess.ChessPiece;
-import models.chess.ChessPosition;
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 
 public class ValidateMove {
 

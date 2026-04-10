@@ -1,7 +1,6 @@
 package dataaccess;
 
-import models.chess.ChessBoard;
-import models.chess.ChessGame;
+import chess.ChessGame;
 import models.AuthData;
 import models.GameData;
 import models.UserData;

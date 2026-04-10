@@ -4,16 +4,13 @@ import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
-import exceptions.ResponseException;
 import io.javalin.websocket.*;
 import models.AuthData;
 import models.GameData;
-import models.chess.ChessGame;
-import models.chess.ChessMove;
-import models.chess.ChessPiece;
-import models.chess.InvalidMoveException;
-import server.Server;
-import server.ServerFacade;
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.InvalidMoveException;
 import websocket.State;
 import websocket.commands.*;
 import websocket.messages.ErrorMessage;
@@ -22,7 +19,6 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 

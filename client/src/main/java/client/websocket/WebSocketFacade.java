@@ -2,10 +2,8 @@ package client.websocket;
 
 import com.google.gson.Gson;
 import exceptions.ResponseException;
-import models.GameData;
-import models.chess.ChessGame;
-import models.chess.ChessMove;
-import models.chess.InvalidMoveException;
+import chess.ChessGame;
+import chess.ChessMove;
 import websocket.State;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;

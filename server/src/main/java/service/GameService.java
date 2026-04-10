@@ -1,6 +1,6 @@
 package service;
 
-import models.chess.ChessGame;
+import chess.ChessGame;
 import dataaccess.*;
 import exceptions.AlreadyTakenException;
 import exceptions.ImproperRequestException;

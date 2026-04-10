@@ -1,6 +1,6 @@
 package client;
 
-import models.chess.ChessGame;
+import chess.ChessGame;
 import requests.RegisterRequest;
 import org.junit.jupiter.api.*;
 import requests.*;

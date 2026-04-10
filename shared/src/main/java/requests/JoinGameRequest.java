@@ -1,6 +1,6 @@
 package requests;
 
-import models.chess.ChessGame;
+import chess.ChessGame;
 
 public class JoinGameRequest {
     ChessGame.TeamColor playerColor;
