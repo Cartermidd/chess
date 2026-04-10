@@ -190,12 +190,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK) | (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE))){
                 if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
                     var update = String.format("%s (black) is in checkmate",gameData.blackUsername());
-                    connections.broadcast(command.getGameID(), null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update + "White wins!"));
+                    connections.broadcast(command.getGameID(), null,
+                            new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update + "White wins!"));
                     gameData.game().setGameOver();
                     gameDAO.updateGame(command.getGameID(),gameData.game());
                 } else if (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE)){
                     var update = String.format("%s (white) is in checkmate",gameData.whiteUsername());
-                    connections.broadcast(command.getGameID(), null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update + "Black wins!"));
+                    connections.broadcast(command.getGameID(), null,
+                            new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update + "Black wins!"));
                     gameData.game().setGameOver();
                     gameDAO.updateGame(command.getGameID(),gameData.game());
                 }
