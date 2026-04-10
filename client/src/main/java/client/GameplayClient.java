@@ -94,7 +94,8 @@ public class GameplayClient implements ServerMessageHandler {
                 }
                 ChessPosition position = positionParse(params[0]);
                 if (gameData.game().getBoard().getPiece(position) == null){
-                    return printBoard(state, gameData.game().getBoard(), null) + "\n" + formatError("Select a square with a piece on it to highlight available moves!");
+                    return printBoard(state, gameData.game().getBoard(), null)
+                            + "\n" + formatError("Select a square with a piece on it to highlight available moves!");
                 }
                 Collection<ChessPosition> moveEndPositions = new ArrayList<>(List.of());
                 moveEndPositions.add(position);
@@ -117,7 +118,8 @@ public class GameplayClient implements ServerMessageHandler {
             if(!gameData.game().getTeamTurn().equals(stateToColor(state))){return formatError("Can't make move when it's not your turn!");}
             try {
                 if(params.length < 2 | params.length > 3){
-                    throw new ImproperRequestException("Misformatted Request - Expected: 'move' <current position> <destination> <promotion (if needed)> (e.g. g7 h8 q)");
+                    throw new ImproperRequestException(
+                            "Misformatted Request - Expected: 'move' <current position> <destination> <promotion (if needed)> (e.g. g7 h8 q)");
                 }
 
                 ChessPosition startPosition = positionParse(params[0]);
@@ -340,7 +342,8 @@ public class GameplayClient implements ServerMessageHandler {
         try {
             char rowNumber = input.charAt(1);
             int row = Integer.parseInt(String.valueOf(rowNumber));
-            if (row > 8 | row < 1){throw new MisformattedChessPositionException("Chess Position must be formatted column letter (a-h) row number (1-8) - (e.g. g7)");}
+            if (row > 8 | row < 1){throw new MisformattedChessPositionException(
+                    "Chess Position must be formatted column letter (a-h) row number (1-8) - (e.g. g7)");}
             return new ChessPosition(row, col);
         }catch (NumberFormatException ex){
             throw new MisformattedChessPositionException("Chess Position must be formatted column letter (a-h) row number (1-8) - (e.g. g7)");
@@ -354,7 +357,10 @@ public class GameplayClient implements ServerMessageHandler {
             case 'r', 'R' -> ChessPiece.PieceType.ROOK;
             case 'b', 'B' -> ChessPiece.PieceType.BISHOP;
             case 'k', 'K' -> ChessPiece.PieceType.KNIGHT;
-            default -> throw new MisformattedChessPositionException("Promotion Chess Piece must be formatted with the first letter of a promotion piece (q,r,b,k)");
+            default -> throw new MisformattedChessPositionException(
+                    "Promotion Chess Piece must be formatted with " +
+                            "the first letter of a promotion piece (q,r,b,k)"
+            );
         };
     }
 
@@ -369,7 +375,9 @@ public class GameplayClient implements ServerMessageHandler {
             case 'f', 'F' -> 6;
             case 'g', 'G' -> 7;
             case 'h', 'H' -> 8;
-            default -> throw new MisformattedChessPositionException("Chess Position must be formatted column letter (a-h) row number (1-8) - (e.g. g7)");
+            default -> throw new MisformattedChessPositionException(
+                    "Chess Position must be formatted column letter (a-h) row number (1-8) - (e.g. g7)"
+            );
         };
     }
 
@@ -414,5 +422,4 @@ public class GameplayClient implements ServerMessageHandler {
             case OBSERVER -> null;
         };
     }
-    //comment so I can test
 }

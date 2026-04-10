@@ -90,34 +90,4 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-
-    public void loadGame(ChessGame game) throws ResponseException {
-        try {
-            var action = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
-            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-        } catch (IOException ex) {
-            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
-        }
-    }
-
-
-    public void rootError(String error) throws ResponseException {
-        try{
-            var action = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, error);
-            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-        } catch (IOException ex){
-            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
-        }
-    }
-
-    public void sendNotification(String notification) throws ResponseException {
-        try{
-            var action = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, notification);
-            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-        } catch (IOException ex){
-            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
-        }
-    }
-
-
 }

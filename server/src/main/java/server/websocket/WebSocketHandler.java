@@ -157,13 +157,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-//    ws.sendNotification("\n" + formatCheck(String.format("%s (black) is in check", gameData.blackUsername())));
-//        ws.sendNotification("\n" + formatCheck(String.format("%s (white) is in check", gameData.whiteUsername())));
-//        ws.sendNotification("\n" + formatCheck(String.format("%s (black) has been checkmated", gameData.blackUsername()) + "\n" + String.format("%s wins!", gameData.whiteUsername())));
-//         ws.sendNotification("\n" + formatCheck(String.format("%s (white) has been checkmated", gameData.whiteUsername()) + "\n" + String.format("%s wins!", gameData.blackUsername())));
-//           ws.sendNotification("\n" + formatStalemate("Stalemate! No one wins!"));
-//
-
     private String roleString(State state){
         return switch (state){
             case BLACK -> "black";
@@ -194,7 +187,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         if (move.getPromotionPiece() == null){
             return String.format("from %s to %s", move.getStartPosition(), move.getEndPosition());
         } else {
-            return String.format("from %s to %s, promoting to a %s", move.getStartPosition(), move.getEndPosition(), pieceToString(move.getPromotionPiece()));
+            return String.format("from %s to %s, promoting to a %s", move.getStartPosition(),
+                    move.getEndPosition(), pieceToString(move.getPromotionPiece()));
         }
     }
 

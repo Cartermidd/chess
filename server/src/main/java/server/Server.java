@@ -55,34 +55,6 @@ public class Server {
                 });
     }
 
-//    public Server(UserService userService, GameService gameService, ClearService clearService) {
-//        this.userService = userService;
-//        this.gameService = gameService;
-//        this.clearService = clearService;
-//        this.registerHandler = new RegisterHandler(userService);
-//        this.loginHandler = new LoginHandler(userService);
-//        this.logoutHandler = new LogoutHandler(userService);
-//        this.listGamesHandler = new ListGamesHandler(gameService);
-//        this.createGameHandler =  new CreateGameHandler(gameService);
-//        this.joinGameHandler = new JoinGameHandler(gameService);
-//        this.clearHandler = new ClearHandler(clearService);
-//        this.webSocketHandler = new WebSocketHandler(authDAO, gameDAO);
-//
-//        javalin = Javalin.create(config -> config.staticFiles.add("web"))
-//                .post("/user", registerHandler::register)
-//                .post("/session", loginHandler::login)
-//                .delete("/session", logoutHandler::logout)
-//                .get("/game", listGamesHandler::listGames)
-//                .post("/game", createGameHandler::createGame)
-//                .put("/game", joinGameHandler::joinGame)
-//                .delete("/db", clearHandler::clear)
-//                .ws("/ws", ws -> {
-//                    ws.onConnect(webSocketHandler);
-//                    ws.onMessage(webSocketHandler);
-//                    ws.onClose(webSocketHandler);
-//                });
-//
-//    }
 
     public int run(int desiredPort) {
         javalin.start(desiredPort);
