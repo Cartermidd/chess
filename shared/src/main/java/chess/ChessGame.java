@@ -15,6 +15,7 @@ public class ChessGame {
 
     ChessBoard board;
     TeamColor turnHaver;
+    boolean gameOver = false;
 
     public ChessGame() {
         this.board = new ChessBoard();
@@ -170,6 +171,11 @@ public class ChessGame {
         return chessGame.board.equals(board) && turnHaver == chessGame.turnHaver;
     }
 
+    public boolean isGameOver(){return gameOver;}
+
+    public void setGameOver(){
+        gameOver = true;
+    }
 
     private static final Gson GSON = new Gson();
 

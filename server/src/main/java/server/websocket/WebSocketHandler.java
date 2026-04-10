@@ -119,10 +119,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 ctx.send(new Gson().toJson(new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Observers can't resign")));
                 return;
             }
+            if (gameData.game().isGameOver()){
+                ctx.send(new Gson().toJson(new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR, "Game is over")));
+                return;
+            }
 
             var message = String.format("%s (%s) has resigned the game", username, state);
             var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
             connections.broadcast(null, notification);
+            gameData.game().setGameOver();
         } catch (DataAccessException ex){
             throw new IOException("Unable to query database.");
         }
@@ -141,6 +147,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             if (gameData == null){
                 ctx.send(new Gson().toJson(new ErrorMessage(
                         ServerMessage.ServerMessageType.ERROR, "Game not found")));
+                return;
+            }
+            if (gameData.game().isGameOver()){
+                ctx.send(new Gson().toJson(new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR, "Game is over")));
                 return;
             }
             State role = determineRole(user.userName(), gameData);
@@ -179,9 +190,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
                     var update = String.format("%s (black) is in checkmate",gameData.blackUsername());
                     connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update + "White wins!"));
+                    gameData.game().setGameOver();
                 } else if (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE)){
                     var update = String.format("%s (white) is in checkmate",gameData.whiteUsername());
                     connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update + "Black wins!"));
+                    gameData.game().setGameOver();
                 }
             } else if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)) {
                 var update = String.format("%s (black) is in check",gameData.blackUsername());
@@ -191,8 +204,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update));
             } else if (gameData.game().isInStalemate(ChessGame.TeamColor.BLACK)) {
                 connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Stalemate!"));
+                gameData.game().setGameOver();
             }
-
 
         } catch (DataAccessException ex) {
             throw new IOException("Unable to query database.");
