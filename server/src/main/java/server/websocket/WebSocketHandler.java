@@ -177,7 +177,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 ctx.send(new Gson().toJson( new ErrorMessage(ServerMessage.ServerMessageType.ERROR, ex.getMessage())));
                 return;
             }
-
+//comment for resubmit
             gameDAO.updateGame(command.getGameID(), game);
 
             connections.broadcast(command.getGameID(), null, new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game));
