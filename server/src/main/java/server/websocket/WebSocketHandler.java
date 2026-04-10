@@ -63,13 +63,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void connect(WsMessageContext ctx, UserGameCommand command) throws IOException {
         try {
-            connections.add(ctx.session);
             GameData gameData = gameDAO.findByID(command.getGameID());
             if (gameData == null){
                 ctx.send(new Gson().toJson(new ErrorMessage(
                         ServerMessage.ServerMessageType.ERROR, "Game not found")));
                 return;
             }
+            connections.add(gameData.gameID(), ctx);
             AuthData user = authDAO.findByAuth(command.getAuthToken());
             if (user == null){
                 ctx.send(new Gson().toJson(new ErrorMessage(
@@ -85,7 +85,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             String role = roleString(determineRole(user.userName(), gameData));
             var message = String.format("%s has joined the game as %s", user.userName(), role);
             var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-            connections.broadcast(ctx.session, notification); // send notification
+            connections.broadcast(command.getGameID(), ctx, notification); // send notification
         } catch (DataAccessException ex){
             ctx.send(new Gson().toJson(new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Failed to connect: " + ex.getMessage())));
         }
@@ -100,11 +100,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             String role = roleString(state);
             var message = String.format("%s (%s) has left the game", username, role);
             var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-            connections.broadcast(ctx.session, notification);
+            connections.broadcast(command.getGameID(), ctx, notification);
             if (role != "observer") {
                 gameDAO.clearPlayer(command.getGameID(), stateToColor(state));
             }
-            connections.remove(ctx.session);
+            connections.remove(command.getGameID(), ctx);
         } catch (DataAccessException ex){
             throw new IOException("Unable to query database.");
         }
@@ -127,8 +127,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             var message = String.format("%s (%s) has resigned the game", username, state);
             var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-            connections.broadcast(null, notification);
+            connections.broadcast(command.getGameID(), null, notification);
             gameData.game().setGameOver();
+            gameDAO.updateGame(command.getGameID(),gameData.game());
         } catch (DataAccessException ex){
             throw new IOException("Unable to query database.");
         }
@@ -179,35 +180,38 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             gameDAO.updateGame(command.getGameID(), game);
 
-            connections.broadcast(null, new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game));
+            connections.broadcast(command.getGameID(), null, new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game));
 
             String username = authDAO.findByAuth(command.getAuthToken()).userName();
 
             String move = parceMove(command.move);
             var message = String.format("%s (%s) moved %s", username, role, move);
-            connections.broadcast(ctx.session, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
+            connections.broadcast(command.getGameID(), ctx, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
             if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK) | (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE))){
                 if (gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK)) {
                     var update = String.format("%s (black) is in checkmate",gameData.blackUsername());
-                    connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update + "White wins!"));
+                    connections.broadcast(command.getGameID(), null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update + "White wins!"));
                     gameData.game().setGameOver();
+                    gameDAO.updateGame(command.getGameID(),gameData.game());
                 } else if (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE)){
                     var update = String.format("%s (white) is in checkmate",gameData.whiteUsername());
-                    connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update + "Black wins!"));
+                    connections.broadcast(command.getGameID(), null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update + "Black wins!"));
                     gameData.game().setGameOver();
+                    gameDAO.updateGame(command.getGameID(),gameData.game());
                 }
             } else if (gameData.game().isInCheck(ChessGame.TeamColor.BLACK)) {
                 var update = String.format("%s (black) is in check",gameData.blackUsername());
-                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update));
+                connections.broadcast(command.getGameID(), null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update));
             } else if (gameData.game().isInCheck(ChessGame.TeamColor.WHITE)){
                 var update = String.format("%s (white) is in check",gameData.whiteUsername());
-                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update));
+                connections.broadcast(command.getGameID(), null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, update));
             } else if (gameData.game().isInStalemate(ChessGame.TeamColor.BLACK)) {
-                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Stalemate!"));
+                connections.broadcast(command.getGameID(), null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Stalemate!"));
                 gameData.game().setGameOver();
             }
 
         } catch (DataAccessException ex) {
+
             throw new IOException("Unable to query database.");
         }
     }
